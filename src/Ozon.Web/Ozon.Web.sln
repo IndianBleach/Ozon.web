@@ -5,6 +5,10 @@ VisualStudioVersion = 17.2.32602.215
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ozon.Web", "Ozon.Web.csproj", "{16D38DE2-8C4A-4768-A517-141A55EAC354}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Grpc", "..\Services\Ozon.user\Grpc\Grpc.csproj", "{7F05F6F2-E81B-4D15-9A30-FD882C18FEBE}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Services.user", "Services.user", "{ACF6E1CE-ABEB-443B-905D-E499247E4FDA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,9 +19,16 @@ Global
 		{16D38DE2-8C4A-4768-A517-141A55EAC354}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{16D38DE2-8C4A-4768-A517-141A55EAC354}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{16D38DE2-8C4A-4768-A517-141A55EAC354}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7F05F6F2-E81B-4D15-9A30-FD882C18FEBE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7F05F6F2-E81B-4D15-9A30-FD882C18FEBE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7F05F6F2-E81B-4D15-9A30-FD882C18FEBE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7F05F6F2-E81B-4D15-9A30-FD882C18FEBE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{7F05F6F2-E81B-4D15-9A30-FD882C18FEBE} = {ACF6E1CE-ABEB-443B-905D-E499247E4FDA}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {C692CB65-4CC5-4FC4-8A02-E15A5E53562F}
