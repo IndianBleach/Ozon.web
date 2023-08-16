@@ -5,15 +5,15 @@ VisualStudioVersion = 17.2.32602.215
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ozon.Web", "Ozon.Web.csproj", "{16D38DE2-8C4A-4768-A517-141A55EAC354}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "User.Grpc", "..\Services\Services.User\Grpc\User.Grpc.csproj", "{7F05F6F2-E81B-4D15-9A30-FD882C18FEBE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Accounts.Grpc", "..\Services\Services.Accounts\Accounts.Grpc\Accounts.Grpc.csproj", "{7F05F6F2-E81B-4D15-9A30-FD882C18FEBE}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Services.user", "Services.user", "{ACF6E1CE-ABEB-443B-905D-E499247E4FDA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "User.Data", "..\Services\Services.User\Data\User.Data.csproj", "{E1D8E1F3-8F29-4303-8FF6-33860F37A0FE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Accounts.Data", "..\Services\Services.Accounts\Accounts.Data\Accounts.Data.csproj", "{E1D8E1F3-8F29-4303-8FF6-33860F37A0FE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "User.Infrastructure", "..\Services\Services.User\Infrastructure\User.Infrastructure.csproj", "{A5F1E779-7F36-4582-A5F9-7D064F67BFF8}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Accounts.Infrastructure", "..\Services\Services.Accounts\Accounts.Infrastructure\Accounts.Infrastructure.csproj", "{A5F1E779-7F36-4582-A5F9-7D064F67BFF8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common", "..\Common\Common.csproj", "{868EC8BD-620E-4F06-A7E5-93BC76B7F50B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Common", "..\Common\Common.csproj", "{868EC8BD-620E-4F06-A7E5-93BC76B7F50B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
