@@ -3,7 +3,7 @@ using Common.DataQueries;
 
 namespace Authorization.Api.Services.Jwt.Client
 {
-    public interface IJwtAuthorizeService
+    public interface IJwtClientService
     {
         Task<QueryResult<JwtAuthorizeResponse>> SignInAsync(
             string userName,
@@ -15,6 +15,9 @@ namespace Authorization.Api.Services.Jwt.Client
         Task<QueryResult<JwtAuthorizeResponse>> RefreshAccessTokenAsync(
             string accessToken);
 
-        Task<QueryResult<JwtAuthorizeResponse>> SignUpAsync();
+        Task<QueryResult<JwtAuthorizeResponse>> SignUpAsync(
+            string userLogin,
+            string password,
+            string email);
     }
 }

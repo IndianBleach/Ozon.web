@@ -1,11 +1,29 @@
+using Authorization.Api.Services.Jwt;
+using Authorization.Api.Services.Jwt.Client;
+using Authorization.Api.Services.Jwt.Tokens;
+using Authorization.Api.Services.RedisCache;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+// services
+builder.Services.AddSingleton(new JwtOptionsProvider(
+    issuer: builder.Configuration["JwtAuth:Issuer"],
+    audince: builder.Configuration["JwtAuth:Audince"],
+    key: builder.Configuration["JwtAuth:SecretKey"],
+    lifeTimeInMinutes: int.Parse(builder.Configuration["JwtAuth:AccessTokenLifeTime"])));
+
+builder.Services.AddSingleton<IJwtTokenWorker, JwtTokenWorker>();
+
+builder.Services.AddSingleton<IJwtClientService, JwtClientService>();
+
+builder.Services.AddTransient<IAuthRedisService, AuthRedisService>();
 
 var app = builder.Build();
 

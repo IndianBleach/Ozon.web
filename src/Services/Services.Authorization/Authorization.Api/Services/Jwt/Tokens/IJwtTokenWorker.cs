@@ -6,14 +6,16 @@
     // write new access token
     // remove user-auth info
 
-    public interface IJwtTokenService
+    public interface IJwtTokenWorker
     {
         bool ValidateAccessToken(string accessToken);
 
         bool CheckUserHasRefreshToken(string refreshToken);
 
-        string WriteAccessToken(string userId);
+        string WriteAccessToken(
+            string userId,
+            string login);
 
-        void RemoveUserAuthorizeInfo();
+        string WriteRefreshToken();
     }
 }
