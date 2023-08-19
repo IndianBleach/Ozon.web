@@ -8,8 +8,12 @@ using System.Threading.Tasks;
 
 namespace Infrastructure.DataServices
 {
-    internal interface IUserService
+    public interface IUserAccountService
     {
-        Task<QueryResult<UserReadDto>> FindById(string id);
+        Task<QueryResult<UserAccountReadDto>> FindAccountById(string userAccountId);
+
+        Task<QueryResult<UserAccountReadDto>> FindAccountByName(string userName);
+
+
     }
 }

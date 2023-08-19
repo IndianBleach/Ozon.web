@@ -1,4 +1,5 @@
-﻿using Data.Entities;
+﻿using Accounts.Data.Entities.AccountEntities;
+using Data.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,10 +8,18 @@ using System.Threading.Tasks;
 
 namespace Accounts.Data.Entities.RoleEntities
 {
-    internal class UserRole
+    public class UserRole
     {
-        public ApplicationUser
+        public string Id { get; set; }
 
         public string Name { get; set; }
+
+        public ICollection<UserAccount> UserAccounts { get; set; }
+
+        public UserRole(string name)
+        {
+            Name = name;
+            UserAccounts = new List<UserAccount>();
+        }
     }
 }

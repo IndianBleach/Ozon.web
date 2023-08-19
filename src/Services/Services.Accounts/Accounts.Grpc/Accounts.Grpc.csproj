@@ -7,7 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Protobuf Include="Protos\greet.proto" GrpcServices="Server" />
+    <None Remove="Protos\accountCommon.proto" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Protobuf Include="Protos\accounts.proto" GrpcServices="Server" />
+    <Protobuf Include="Protos\accountCommon.proto" />
   </ItemGroup>
 
   <ItemGroup>
@@ -17,6 +22,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Accounts.Data\Accounts.Data.csproj" />
+    <ProjectReference Include="..\Accounts.Infrastructure\Accounts.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>
