@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+option csharp_namespace = "Grpc.Accounts.Common";
+
+package accounts;
+
+
+message UserAccount {
+	string user_id = 1;
+	string account_id = 2;
+	string user_name = 3;
+	AccountRole role = 4;
+}
+
+message QueryResultState {
+	bool is_successed = 1;
+	string error_message = 2;
+}
+
+
+message AccountRole {
+	string role_id = 1;
+	string role_normalize_name = 2;
+}
