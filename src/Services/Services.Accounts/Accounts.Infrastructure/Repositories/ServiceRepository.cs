@@ -1,4 +1,5 @@
-﻿using Common.Repositories;
+﻿using Common.DataQueries;
+using Common.Repositories;
 using Common.Specifications;
 using System;
 using System.Collections.Generic;
@@ -16,6 +17,22 @@ namespace Accounts.Infrastructure.Repositories
         public ServiceRepository(ApplicationContext dbContext)
         {
             _dbContext = dbContext;
+        }
+
+        public QueryResult<string> Create(T entity)
+        {
+            try
+            {
+                _dbContext.Add(entity);
+
+                _dbContext.SaveChanges();
+
+                return QueryResult<string>.Successed(entity.Id);
+            }
+            catch (Exception exp)
+            {
+                return QueryResult<string>.Failure(exp.Message);
+            }
         }
 
         public IEnumerable<T> FindBy(ISpecification<T> specification)
