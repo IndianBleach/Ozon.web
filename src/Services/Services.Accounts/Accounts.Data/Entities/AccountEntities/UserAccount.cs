@@ -1,4 +1,5 @@
 ﻿using Accounts.Data.Entities.RoleEntities;
+using Common.Repositories;
 using Data.Entities;
 using System;
 using System.Collections.Generic;
@@ -8,10 +9,8 @@ using System.Threading.Tasks;
 
 namespace Accounts.Data.Entities.AccountEntities
 {
-    public class UserAccount
+    public class UserAccount : TEntity
     {
-        public string Id { get; set; }
-
         public string UserId { get; set; }
 
         public ApplicationUser? User { get; set; }

@@ -1,4 +1,7 @@
+using Accounts.Data.Entities.AccountEntities;
+using Authorization.Api.Repo;
 using Authorization.Api.Services.Jwt.Client;
+using Common.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using Redis.OM;
 using Redis.OM.Modeling;
@@ -17,11 +20,14 @@ namespace Authorization.Api.Controllers
     [Route("[controller]")]
     public class AuthorizeController : ControllerBase
     {
-        private readonly IJwtClientService _jwtClientService;
+        //private readonly IJwtClientService _jwtClientService;
 
-        public AuthorizeController(IJwtClientService jwtClientService)
+        private readonly IServiceRepository<UserAccount> _repository;
+
+        public AuthorizeController(
+            IServiceRepository<UserAccount> repo)
         {
-            _jwtClientService = jwtClientService;
+            _repository = repo;
         }
 
 
@@ -37,10 +43,9 @@ namespace Authorization.Api.Controllers
             string password,
             string email)
         {
-            return Ok(await _jwtClientService.SignUpAsync(
-                userLogin: login,
-                password: password,
-                email: email));
+            //_repository.FindBySpec();
+
+            return Ok(1);
         }
 
 

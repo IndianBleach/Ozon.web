@@ -2,10 +2,10 @@ using Authorization.Api.Services.Jwt;
 using Authorization.Api.Services.Jwt.Client;
 using Authorization.Api.Services.Jwt.Tokens;
 using Authorization.Api.Services.RedisCache;
+using Common.Repositories;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
-
-// Add services to the container.
 
 builder.Services.AddControllers();
 

@@ -1,26 +1,29 @@
-﻿using Common.DataQueries;
+﻿using Accounts.Infrastructure.Specifications;
+using Common.DataQueries;
+using Common.Repositories;
+using Common.Specifications;
 using Grpc.Accounts;
 using Grpc.Accounts.Common;
 using Grpc.Core;
-using Infrastructure.DataServices;
 
 namespace Accounts.Grpc.GrpcServices
 {
     public class UserAccountGrpc : UserAccountGrpcService.UserAccountGrpcServiceBase
     {
-        private readonly IUserAccountService _userAccountService;
+        private readonly IServiceRepository<UserAccount> _accountRepository;
 
-        public UserAccountGrpc(IUserAccountService userAccountService)
+        public UserAccountGrpc(IServiceRepository<UserAccount> accountRepository)
         {
-            _userAccountService = userAccountService;
+            _accountRepository = accountRepository;
         }
 
         public override async Task<FindUserAccountByUserNameResponse> FindAccountByUserName(FindUserAccountByUserNameRequest request, ServerCallContext context)
         {
-            var result = await _userAccountService.FindAccountByName(
-                userName: request.UserName);
+            ISpecification<UserAccount> spec = (ISpecification<UserAccount>)new AccountByNameSpec(request.UserName);
 
-            if (!result.IsSuccessed)
+            UserAccount? result = _accountRepository.FirstOrDefault(spec);
+                
+            if (result == null)
                 return new FindUserAccountByUserNameResponse()
                 {
                     QueryState = new QueryResultState
@@ -34,26 +37,27 @@ namespace Accounts.Grpc.GrpcServices
             {
                 UserAccount = new UserAccount
                 {
-                    AccountId = result.Value.AccountId,
-                    Role = result.Value.Role != null ?
+                    AccountId = result.AccountId,
+                    Role = result.Role != null ?
                         new AccountRole
                         {
-                            RoleId = result.Value.Role.RoleId,
-                            RoleNormalizeName = result.Value.Role.RoleName
+                            RoleId = result.Role.RoleId,
+                            RoleNormalizeName = result.Role.RoleNormalizeName
                         }
                         : null,
-                    UserId = result.Value.UserId,
-                    UserName = result.Value.UserName
+                    UserId = result.UserId,
+                    UserName = result.UserName
                 }
             };
         }
 
         public override async Task<FindUserAccountByIdResponse> FindAccountById(FindUserAccountByIdRequest request, ServerCallContext context)
         {
-            var result = await _userAccountService.FindAccountById(
-                userAccountId: request.UserAccountId);
+            ISpecification<UserAccount> spec = (ISpecification<UserAccount>)new AccountByIdSpec(request.UserAccountId);
 
-            if (!result.IsSuccessed)
+            var result = _accountRepository.FirstOrDefault(spec);
+
+            if (result == null)
                 return new FindUserAccountByIdResponse()
                 {
                     QueryState = new QueryResultState
@@ -67,16 +71,16 @@ namespace Accounts.Grpc.GrpcServices
             {
                 UserAccount = new UserAccount
                 {
-                    AccountId = result.Value.AccountId,
-                    Role = result.Value.Role != null ?
+                    AccountId = result.AccountId,
+                    Role = result.Role != null ?
                         new AccountRole
                         {
-                            RoleId = result.Value.Role.RoleId,
-                            RoleNormalizeName = result.Value.Role.RoleName
+                            RoleId = result.Role.RoleId,
+                            RoleNormalizeName = result.Role.RoleNormalizeName
                         }
                         : null,
-                    UserId = result.Value.UserId,
-                    UserName = result.Value.UserName
+                    UserId = result.UserId,
+                    UserName = result.UserName
                 }
             };
         }
