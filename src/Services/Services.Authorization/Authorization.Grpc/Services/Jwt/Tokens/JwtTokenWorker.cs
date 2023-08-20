@@ -5,7 +5,7 @@ using System.Security.Cryptography;
 using System.Security.Principal;
 using System.Text;
 
-namespace Authorization.Api.Services.Jwt.Tokens
+namespace Authorization.Grpc.Services.Jwt.Tokens
 {
     public class JwtTokenWorker : IJwtTokenWorker
     {
@@ -14,16 +14,6 @@ namespace Authorization.Api.Services.Jwt.Tokens
         public JwtTokenWorker(JwtOptionsProvider jwtOptions)
         {
             _jwtOptions = jwtOptions;
-        }
-
-        public bool CheckUserHasRefreshToken(string refreshToken)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void RemoveUserAuthorizeInfo()
-        {
-            throw new NotImplementedException();
         }
 
         public bool ValidateAccessToken(
@@ -65,11 +55,6 @@ namespace Authorization.Api.Services.Jwt.Tokens
             SymmetricSecurityKey secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtOptions.Key));
             SigningCredentials signinCredentials = new SigningCredentials(secretKey, SecurityAlgorithms.HmacSha256);
 
-            Console.WriteLine("JWT-OPT: " + _jwtOptions.Key);
-            Console.WriteLine("JWT-OPT: " + _jwtOptions.Issuer);
-            Console.WriteLine("JWT-OPT: " + _jwtOptions.Audince);
-            Console.WriteLine("JWT-OPT: " + _jwtOptions.LifeTimeMinutes);
-
             JwtSecurityToken tokenOptions = new JwtSecurityToken(
                 issuer: _jwtOptions.Issuer,
                 audience: _jwtOptions.Audince,
@@ -81,8 +66,6 @@ namespace Authorization.Api.Services.Jwt.Tokens
                 expires: DateTime.Now.AddMinutes(_jwtOptions.LifeTimeMinutes),
                 signingCredentials: signinCredentials
             );
-
-            Console.WriteLine("SECTION OF ACCESS TOKERN");
 
             string tokenString = new JwtSecurityTokenHandler()
                 .WriteToken(tokenOptions);

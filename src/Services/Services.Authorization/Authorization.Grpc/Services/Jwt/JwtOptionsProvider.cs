@@ -1,4 +1,4 @@
-﻿namespace Authorization.Api.Services.Jwt
+﻿namespace Authorization.Grpc.Services.Jwt
 {
     public class JwtOptionsProvider
     {

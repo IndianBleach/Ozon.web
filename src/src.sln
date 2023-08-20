@@ -23,9 +23,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Products.Data", "Services\S
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Services.Authorization", "Services.Authorization", "{6BC667A0-5DE8-4536-AE06-7A580DAE2148}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Authorization.Grpc", "Services\Services.Authorization\Authorization.Grpc\Authorization.Grpc.csproj", "{82BB2D5E-38A0-4ADE-AB55-642DEC6A24FE}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ozon.Api", "Ozon.Api\Ozon.Api.csproj", "{791C2EE1-C158-4EDE-B23C-F1F392857D80}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Authorization.Grpc", "Services\Services.Authorization\Authorization.Grpc\Authorization.Grpc.csproj", "{82BB2D5E-38A0-4ADE-AB55-642DEC6A24FE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -65,10 +63,6 @@ Global
 		{82BB2D5E-38A0-4ADE-AB55-642DEC6A24FE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{82BB2D5E-38A0-4ADE-AB55-642DEC6A24FE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{82BB2D5E-38A0-4ADE-AB55-642DEC6A24FE}.Release|Any CPU.Build.0 = Release|Any CPU
-		{791C2EE1-C158-4EDE-B23C-F1F392857D80}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{791C2EE1-C158-4EDE-B23C-F1F392857D80}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{791C2EE1-C158-4EDE-B23C-F1F392857D80}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{791C2EE1-C158-4EDE-B23C-F1F392857D80}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,4 +1,4 @@
-﻿namespace Authorization.Api.Services.Jwt.Tokens
+﻿namespace Authorization.Grpc.Services.Jwt.Tokens
 {
     // [REDIS]
     // validate access token
@@ -9,8 +9,6 @@
     public interface IJwtTokenWorker
     {
         bool ValidateAccessToken(string accessToken);
-
-        bool CheckUserHasRefreshToken(string refreshToken);
 
         string WriteAccessToken(
             string userId,

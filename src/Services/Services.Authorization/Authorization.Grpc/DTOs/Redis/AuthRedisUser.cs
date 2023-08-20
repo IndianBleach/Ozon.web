@@ -1,4 +1,4 @@
-﻿namespace Authorization.Api.DTOs.Redis
+﻿namespace Authorization.Grpc.DTOs.Redis
 {
     public class AuthRedisUser
     {

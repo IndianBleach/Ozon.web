@@ -1,4 +1,4 @@
-﻿namespace Authorization.Api.DTOs.Jwt
+﻿namespace Authorization.Grpc.DTOs.Jwt
 {
     public class JwtAuthOptions
     {
