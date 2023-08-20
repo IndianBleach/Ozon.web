@@ -1,0 +1,30 @@
+syntax = "proto3";
+
+import "Protos/accountCommon.proto";
+
+option csharp_namespace = "Grpc.Accounts";
+
+package accounts;
+
+service AccountSecurityGrpcService {
+  
+	rpc CheckLogpass(CheckLogPassRequest) returns (CheckLogPassResponse);
+
+}
+
+
+message SecurityAccountRead {
+	string user_id = 1;
+	string account_id = 2;
+}
+
+message CheckLogPassRequest {
+	string user_login = 1;
+	string input_password = 2;
+}
+message CheckLogPassResponse {
+	oneof result {
+		SecurityAccountRead user_data = 1;
+		QueryResultState query_state = 2;
+	}
+}
