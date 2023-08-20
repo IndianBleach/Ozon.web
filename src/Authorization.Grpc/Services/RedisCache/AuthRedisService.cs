@@ -50,9 +50,16 @@ namespace Authorization.Api.Services.RedisCache
         }
 
 
-        public Task DeleteRedisUserAsync(string authUserId)
+        public async Task DeleteRedisUserAsync(string authUserId)
         {
-            throw new NotImplementedException();
+            await _redisDb.HashDeleteAsync(
+                key: authUserId,
+                new RedisValue[]
+                {
+                    new RedisValue("user_name"),
+                    new RedisValue("expire_time"),
+                    new RedisValue("refresh_token"),
+                });
         }
 
         public async Task<bool> CheckUserHasRefreshToken(
@@ -78,6 +85,37 @@ namespace Authorization.Api.Services.RedisCache
                 return true;
 
             return false;
+        }
+
+        public async Task<QueryResult<HashEntry[]>> UpdateTokenExpireTime(
+            string userId)
+        {
+            HashEntry[] result = await _redisDb.HashGetAllAsync(
+                userId);
+
+            if (result.Length == 0)
+                return QueryResult<HashEntry[]>.Failure("auth-user not found");
+
+            HashEntry? tokenEntry = result
+                .FirstOrDefault(x => x.Name == "refresh_token");
+
+            HashEntry? timeEntry = result
+                .FirstOrDefault(x => x.Name == "expire_time");
+
+            if (!tokenEntry.HasValue ||
+                !timeEntry.HasValue)
+                return QueryResult<HashEntry[]>.Failure("auth-user doesnt have some entries");
+
+            await _redisDb.HashDeleteAsync(
+                key: userId,
+                hashField: "expire_time");
+
+            await _redisDb.HashSetAsync(
+                key: userId,
+                hashField: "expire_time",
+                value: DefaultExpiresTime());
+
+            return QueryResult<HashEntry[]>.Successed(result);
         }
     }
 }
