@@ -1,4 +1,5 @@
-﻿using Common.Specifications;
+﻿using Common.DataQueries;
+using Common.Specifications;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +10,8 @@ namespace Common.Repositories
 {
     public interface IServiceRepository<T>
     {
+        QueryResult<string> Create(T entity);
+
         T? FirstOrDefault(ISpecification<T> spec);
 
         IEnumerable<T> FindBy(ISpecification<T> specification);
