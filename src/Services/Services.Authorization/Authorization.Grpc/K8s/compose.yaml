@@ -1,0 +1,27 @@
+version: v1
+services:
+  ozon-auth-redis:
+    container_name: ozon-auth-redis
+    image: redis
+    networks:
+      - redis-api-net
+    ports:
+      - "4040:9443"
+      - "6379:6379"
+
+  ozon-auth-api:
+    container_name: ozon-auth-api
+    build: 
+      context: ../../../../
+      dockerfile: ./Services/Services.Authorization/Dockerfile
+    networks:
+      - redis-api-net
+    depends_on:
+      - ozon-auth-redis
+    ports:
+      - "8080:80"
+      - "8070:443"
+
+networks:
+  redis-api-net:
+    driver: bridge

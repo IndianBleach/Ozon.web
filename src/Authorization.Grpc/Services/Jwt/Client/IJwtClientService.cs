@@ -9,11 +9,12 @@ namespace Authorization.Api.Services.Jwt.Client
             string userName,
             string userPassword);
 
-        Task<QueryResult<JwtAuthorizeResponse>> SignOutAsync(
-            string userAccountId);
+        Task SignOutAsync(
+            string userId);
 
         Task<QueryResult<JwtAuthorizeResponse>> RefreshAccessTokenAsync(
-            string accessToken);
+            string userId,
+            string refreshToken);
 
         Task<QueryResult<JwtAuthorizeResponse>> SignUpAsync(
             string userLogin,
