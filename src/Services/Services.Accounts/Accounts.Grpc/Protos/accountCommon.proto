@@ -5,11 +5,12 @@ option csharp_namespace = "Grpc.Accounts.Common";
 package accounts;
 
 
-message UserAccount {
+
+message UserAccountRead {
 	string user_id = 1;
 	string account_id = 2;
 	string user_name = 3;
-	AccountRole role = 4;
+	AccountRoleRead role = 4;
 }
 
 message QueryResultState {
@@ -18,7 +19,7 @@ message QueryResultState {
 }
 
 
-message AccountRole {
+message AccountRoleRead {
 	string role_id = 1;
 	string role_normalize_name = 2;
 }
