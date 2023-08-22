@@ -1,0 +1,76 @@
+version: v1
+services:
+
+#services.accounts
+  serv-accounts-mssql:
+    container_name: serv-accounts-mssql
+    image: mcr.microsoft.com/mssql/server
+    ports:
+      - "7070:1433"
+    environment:
+      - MSSQL_SA_PASSWORD=Sample123!
+      - ACCEPT_EULA=Y
+    networks:
+      - ozon-net
+
+  serv-accounts-grpc:
+    container_name: serv-accounts-grpc
+    build: 
+      context: .
+      dockerfile: ./Services/Services.Accounts/Accounts.Grpc/Dockerfile
+    ports:
+      - "5000:5000"
+    networks:
+      - ozon-net
+    depends_on:
+      - serv-accounts-mssql
+
+#services.auth
+  serv-auth-redis:
+    container_name: serv-auth-redis
+    image: redis
+    networks:
+      - ozon-net
+    ports:
+      - "4040:9443"
+      - "6379:6379"
+
+  serv-auth-grpc:
+    container_name: serv-auth-grpc
+    build: 
+      context: .
+      dockerfile: ./Services/Services.Authorization/Dockerfile
+    networks:
+      - ozon-net
+    depends_on:
+      - serv-auth-redis
+    ports:
+      - "6000:6000"
+
+#api
+  ozon-api:
+    container_name: ozon-api
+    build: 
+      context: .
+      dockerfile: ./Ozon.Api/Dockerfile
+    networks:
+      - ozon-net
+    ports:
+      - "9095:80"
+      - "9096:443"
+
+#web
+  ozon-web:
+    container_name: ozon-web
+    build: 
+      context: .
+      dockerfile: ./Ozon.Web/Dockerfile
+    networks:
+      - ozon-net
+    ports:
+      - "9090:80"
+      - "9091:443"
+
+networks:
+  ozon-net:
+    driver: bridge

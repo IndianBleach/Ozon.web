@@ -4,16 +4,16 @@ namespace Ozon.Api.GrpcServiceProviders
 {
     public class AuthorizatonServiceProvider
     {
-        private string url = "https://localhost:5001";
+        //private string url = "https://localhost:5001";
 
-        public AuthorizatonServiceProvider()
-        {
-            var channel = GrpcChannel.ForAddress("https://localhost:5001");
+        //public AuthorizatonServiceProvider()
+        //{
+        //    var channel = GrpcChannel.ForAddress("https://localhost:5001");
 
-            channel.ope
+        //    channel.ope
 
-            var client = new Greet.GreeterClient(channel);
-        }
+        //    var client = new Greet.GreeterClient(channel);
+        //}
 
 
         // open

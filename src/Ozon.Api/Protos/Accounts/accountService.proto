@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-import "Protos/accountCommon.proto";
+import "Protos/Accounts/accountCommon.proto";
 
 option csharp_namespace = "Grpc.Accounts";
 

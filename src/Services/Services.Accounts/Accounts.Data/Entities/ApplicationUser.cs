@@ -1,4 +1,5 @@
-﻿using Accounts.Data.Entities.AccountEntities;
+﻿using Accounts.Data.Entities;
+using Accounts.Data.Entities.AccountEntities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,10 +8,8 @@ using System.Threading.Tasks;
 
 namespace Data.Entities
 {
-    public class ApplicationUser
+    public class ApplicationUser : TEntity
     {
-        public string Id { get; set; }
-
         public string FirstName { get; set; }
 
         public string LastName { get; set; }

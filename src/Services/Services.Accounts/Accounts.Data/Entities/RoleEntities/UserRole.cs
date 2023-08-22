@@ -8,10 +8,8 @@ using System.Threading.Tasks;
 
 namespace Accounts.Data.Entities.RoleEntities
 {
-    public class UserRole
+    public class UserRole : TEntity
     {
-        public string Id { get; set; }
-
         public string Name { get; set; }
 
         public ICollection<UserAccount> UserAccounts { get; set; }

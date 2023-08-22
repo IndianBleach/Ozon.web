@@ -1,6 +1,7 @@
 ﻿using Accounts.Data.Entities.RoleEntities;
 using Common.Repositories;
 using Data.Entities;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;

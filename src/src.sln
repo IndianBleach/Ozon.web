@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.2.32602.215
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ozon.Web", "Ozon.Web\Ozon.Web.csproj", "{16D38DE2-8C4A-4768-A517-141A55EAC354}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Accounts.Grpc", "Services\Services.Accounts\Accounts.Grpc\Accounts.Grpc.csproj", "{7F05F6F2-E81B-4D15-9A30-FD882C18FEBE}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Services.Accounts", "Services.Accounts", "{ACF6E1CE-ABEB-443B-905D-E499247E4FDA}"
@@ -25,7 +23,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Services.Authorization", "S
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Authorization.Grpc", "Services\Services.Authorization\Authorization.Grpc\Authorization.Grpc.csproj", "{82BB2D5E-38A0-4ADE-AB55-642DEC6A24FE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ozon.Api", "Ozon.Api\Ozon.Api.csproj", "{791C2EE1-C158-4EDE-B23C-F1F392857D80}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ozon.Api", "Ozon.Api\Ozon.Api.csproj", "{791C2EE1-C158-4EDE-B23C-F1F392857D80}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Services.Matketplace", "Services.Matketplace", "{6359F63D-B224-4E84-9FD2-F0370E5FF69B}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Marketplace.Grpc", "Services\Services.Marketplace\Marketplace.Grpc\Marketplace.Grpc.csproj", "{C20E1E52-06FC-4E25-A4E2-4210C89763C8}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Marketplace.Data", "Services\Services.Marketplace\Marketplace.Data\Marketplace.Data.csproj", "{470B7FAA-AD02-46B6-842E-72DE6D844C35}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,10 +37,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{16D38DE2-8C4A-4768-A517-141A55EAC354}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{16D38DE2-8C4A-4768-A517-141A55EAC354}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{16D38DE2-8C4A-4768-A517-141A55EAC354}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{16D38DE2-8C4A-4768-A517-141A55EAC354}.Release|Any CPU.Build.0 = Release|Any CPU
 		{7F05F6F2-E81B-4D15-9A30-FD882C18FEBE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{7F05F6F2-E81B-4D15-9A30-FD882C18FEBE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7F05F6F2-E81B-4D15-9A30-FD882C18FEBE}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -69,6 +69,14 @@ Global
 		{791C2EE1-C158-4EDE-B23C-F1F392857D80}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{791C2EE1-C158-4EDE-B23C-F1F392857D80}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{791C2EE1-C158-4EDE-B23C-F1F392857D80}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C20E1E52-06FC-4E25-A4E2-4210C89763C8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C20E1E52-06FC-4E25-A4E2-4210C89763C8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C20E1E52-06FC-4E25-A4E2-4210C89763C8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C20E1E52-06FC-4E25-A4E2-4210C89763C8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{470B7FAA-AD02-46B6-842E-72DE6D844C35}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{470B7FAA-AD02-46B6-842E-72DE6D844C35}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{470B7FAA-AD02-46B6-842E-72DE6D844C35}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{470B7FAA-AD02-46B6-842E-72DE6D844C35}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -80,6 +88,8 @@ Global
 		{015220B7-85EF-4B40-BC5F-531F3E7BA206} = {ECC3CAB6-D8CA-4AB5-8CFA-D2249DA2624E}
 		{07A8AEB2-2630-4DE0-9D88-0F45FD073988} = {ECC3CAB6-D8CA-4AB5-8CFA-D2249DA2624E}
 		{82BB2D5E-38A0-4ADE-AB55-642DEC6A24FE} = {6BC667A0-5DE8-4536-AE06-7A580DAE2148}
+		{C20E1E52-06FC-4E25-A4E2-4210C89763C8} = {6359F63D-B224-4E84-9FD2-F0370E5FF69B}
+		{470B7FAA-AD02-46B6-842E-72DE6D844C35} = {6359F63D-B224-4E84-9FD2-F0370E5FF69B}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {C692CB65-4CC5-4FC4-8A02-E15A5E53562F}
