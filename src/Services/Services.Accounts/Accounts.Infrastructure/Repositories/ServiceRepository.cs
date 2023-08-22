@@ -1,4 +1,5 @@
-﻿using Common.DataQueries;
+﻿using Accounts.Data.Entities;
+using Common.DataQueries;
 using Common.Repositories;
 using Common.Specifications;
 using System;
@@ -10,7 +11,7 @@ using User.Data.Context;
 
 namespace Accounts.Infrastructure.Repositories
 {
-    internal class ServiceRepository<T> : IServiceRepository<T> where T : TEntity
+    public class ServiceRepository<T> : IServiceRepository<T> where T : TEntity
     {
         private readonly ApplicationContext _dbContext;
 

@@ -1,7 +1,7 @@
 version: v1
 services:
     accounts-mssql-db:
-      container_name: "accounts-mssql-db"
+      container_name: accounts-mssql-db
       image: mcr.microsoft.com/mssql/server
       ports:
         - "7070:1433"
@@ -13,16 +13,12 @@ services:
         - grpc-db-net
 
     accounts-grpc-web:
-      container_name: "accounts-mssql-db"
+      container_name: accounts-grpc-web
       build: 
           context: ../../../
           dockerfile: ./Services/Services.Accounts/Accounts.Grpc/Dockerfile
       ports:
         - "6060:80"
-      environment:
-        - MSSQL_SA_PASSWORD=Sample123!
-        - MSSQL_PID=Sample
-        - ACCEPT_EULA=Y
       networks:
         - grpc-db-net
       depends_on:

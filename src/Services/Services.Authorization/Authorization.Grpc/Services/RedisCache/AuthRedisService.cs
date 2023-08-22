@@ -11,7 +11,7 @@ namespace Authorization.Grpc.Services.RedisCache
         public AuthRedisService()
         {
             ConnectionMultiplexer _redis = ConnectionMultiplexer
-                .Connect("ozon-auth-redis");
+                .Connect("serv-auth-redis");
 
             _redisDb = _redis.GetDatabase();
         }
