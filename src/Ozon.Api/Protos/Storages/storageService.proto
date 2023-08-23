@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+
+import "queries.proto";
+
+import "Protos/Storages/storages.proto";
+
+option csharp_namespace = "Grpc.Protos.Storages";
+
+package Grpc.Protos.Storages;
+
+
+
+
+service StorageServiceGrpc {
+
+  rpc CreateMarketStorage (CreateMarketStorageRequest) returns (GlobalGrpc.QueryStringIdResult);
+
+  rpc CreateStorageCell (CreateStorageCellRequest) returns (GlobalGrpc.QueryStringIdResult);
+  //rpc CreateStorageEvent
+
+}
+
+
+
+

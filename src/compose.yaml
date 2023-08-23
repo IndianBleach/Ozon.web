@@ -1,6 +1,30 @@
 version: v1
 services:
 
+#services.storages
+  serv-storage-mssql:
+    container_name: serv-storage-mssql
+    image: mcr.microsoft.com/mssql/server
+    ports:
+      - "7060:1433"
+    environment:
+      - MSSQL_SA_PASSWORD=Sample123!
+      - ACCEPT_EULA=Y
+    networks:
+      - ozon-net
+
+  serv-storage-grpc:
+    container_name: serv-storage-grpc
+    build: 
+      context: .
+      dockerfile: ./Services/Services.Storage/Storage.Grpc/Dockerfile
+    ports:
+      - "5010:5010"
+    networks:
+      - ozon-net
+    depends_on:
+      - serv-storage-mssql
+
 #services.accounts
   serv-accounts-mssql:
     container_name: serv-accounts-mssql
@@ -19,7 +43,7 @@ services:
       context: .
       dockerfile: ./Services/Services.Accounts/Accounts.Grpc/Dockerfile
     ports:
-      - "5000:5000"
+      - "5005:5005"
     networks:
       - ozon-net
     depends_on:
@@ -32,7 +56,7 @@ services:
     networks:
       - ozon-net
     ports:
-      - "4040:9443"
+      - "9443:9443"
       - "6379:6379"
 
   serv-auth-grpc:
@@ -45,7 +69,7 @@ services:
     depends_on:
       - serv-auth-redis
     ports:
-      - "6000:6000"
+      - "5000:5000"
 
 #api
   ozon-api:
@@ -58,18 +82,6 @@ services:
     ports:
       - "9095:80"
       - "9096:443"
-
-#web
-  ozon-web:
-    container_name: ozon-web
-    build: 
-      context: .
-      dockerfile: ./Ozon.Web/Dockerfile
-    networks:
-      - ozon-net
-    ports:
-      - "9090:80"
-      - "9091:443"
 
 networks:
   ozon-net:

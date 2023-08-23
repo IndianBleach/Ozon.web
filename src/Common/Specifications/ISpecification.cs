@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Common.Specifications
 {
-    public interface ISpecification<T>
+    public interface ISpecification<T> where T : class
     {
         Expression<Func<T, bool>> Criteria { get; }
 

@@ -52,7 +52,7 @@ namespace Authorization.Grpc.Services.Jwt.Tokens
             string userId,
             string userName)
         {
-            SymmetricSecurityKey secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtOptions.Key));
+            SymmetricSecurityKey secretKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(_jwtOptions.Key));
             SigningCredentials signinCredentials = new SigningCredentials(secretKey, SecurityAlgorithms.HmacSha256);
 
             JwtSecurityToken tokenOptions = new JwtSecurityToken(

@@ -35,7 +35,7 @@ namespace Accounts.Grpc.GrpcServices
             UserRole role = new UserRole(
                 name: request.RoleName);
 
-            QueryResult<string> query = _roleRepository.Create(role);
+            QueryResult<UserRole> query = _roleRepository.Create(role);
 
             if (!query.IsSuccessed)
                 return new CreateRoleRespone
@@ -49,7 +49,7 @@ namespace Accounts.Grpc.GrpcServices
 
             return new CreateRoleRespone
             {
-                RoleId = query.Value
+                RoleId = query.Value.Id
             };
         }
 
@@ -61,7 +61,7 @@ namespace Accounts.Grpc.GrpcServices
                 email: request.Email,
                 dateCreated: DateTime.Now);
 
-            QueryResult<string> query = _userRepository.Create(user);
+            QueryResult<ApplicationUser> query = _userRepository.Create(user);
 
             if (!query.IsSuccessed)
                 return new CreateCreateUserResponse
@@ -75,7 +75,7 @@ namespace Accounts.Grpc.GrpcServices
 
             return new CreateCreateUserResponse
             {
-                UserId = query.Value
+                UserId = query.Value.Id
             };
         }
 
@@ -101,7 +101,7 @@ namespace Accounts.Grpc.GrpcServices
                 userName: request.UserName,
                 getRole.Id);
 
-            QueryResult<string> createQuery = _accountRepository.Create(account);
+            QueryResult<UserAccount> createQuery = _accountRepository.Create(account);
 
             if (!createQuery.IsSuccessed)
                 return new CreateClientUserAccountResponse
@@ -115,7 +115,7 @@ namespace Accounts.Grpc.GrpcServices
 
             return new CreateClientUserAccountResponse
             {
-                UserAccountId = createQuery.Value
+                UserAccountId = createQuery.Value.Id
             };
         }
 

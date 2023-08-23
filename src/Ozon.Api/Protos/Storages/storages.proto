@@ -1,0 +1,51 @@
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+
+import "queries.proto";
+
+option csharp_namespace = "Grpc.Protos.Storages";
+
+package Grpc.Protos.Storages;
+
+
+// delete (sync)
+// update (sync)
+// 
+
+
+
+message CreateStorageCellRequest {
+    string storage_id = 1;
+    string number_title = 2;
+    string comment = 3;
+}
+
+
+message CreateAddrRequest {
+    string city_addr = 1;
+    string street_addr = 2;
+    string building_addr = 3;
+}
+
+
+message CreateMarketStorageRequest {
+    CreateAddrRequest addr = 1;
+}
+
+
+message StorageAddrRead {
+    string city_addr = 1;
+    string street_addr = 2;
+    string building_addr = 3;
+}
+
+message MarketStorageRead {
+    string storage_id = 1;
+    StorageAddrRead storage_addr = 2;
+}
+
+
+
+
+

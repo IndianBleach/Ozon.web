@@ -20,7 +20,7 @@ namespace Authorization.Grpc.Services.RedisCache
         {
             DateTime dt = DateTime.Now;
 
-            dt.AddDays(1);
+            dt = dt.AddHours(1);
 
             return dt.ToString();
         }

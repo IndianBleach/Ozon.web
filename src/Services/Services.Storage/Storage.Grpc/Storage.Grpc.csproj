@@ -1,0 +1,47 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>92f497c8-6e2d-46b3-9f51-15ff9afc353b</UserSecretsId>
+    <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+    <DockerfileContext>..\..\..</DockerfileContext>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Protos\storages.proto" />
+    <None Remove="Protos\storageService.proto" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Google.Protobuf" Version="3.24.1" />
+    <PackageReference Include="Grpc.AspNetCore" Version="2.40.0" />
+    <PackageReference Include="Grpc.AspNetCore.Server.Reflection" Version="2.55.0" />
+    <PackageReference Include="Grpc.Net.Client" Version="2.55.0" />
+    <PackageReference Include="Grpc.Reflection" Version="2.55.0" />
+    <PackageReference Include="Grpc.Tools" Version="2.57.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="7.0.10" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="7.0.10" />
+    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.15.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Common\Common.csproj" />
+    <ProjectReference Include="..\Storage.Data\Storage.Data.csproj" />
+    <ProjectReference Include="..\Storage.Infrastructure\Storage.Infrastructure.csproj" />
+  </ItemGroup>
+
+	<ItemGroup>
+		<Protobuf Include="..\..\..\Common\Grpc\quries.proto" GrpcServices="None" ProtoCompile="False" Link="Common\Grpc\quries.proto" />
+		<Protobuf GrpcServices="Server" Include="Protos\storageService.proto" AdditionalImportDirs="..\..\..\Common\Grpc" />
+		<Protobuf Include="Protos\storages.proto" GrpcServices="Server">
+		  <AdditionalImportDirs>..\..\..\Common\Grpc</AdditionalImportDirs>
+		</Protobuf>
+	</ItemGroup>
+	
+
+</Project>
