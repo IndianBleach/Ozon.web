@@ -1,6 +1,31 @@
 version: v1
 services:
 
+#kafka
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.3.0
+    hostname: zookeeper
+    container_name: zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+
+  kafka-broker:
+    image: confluentinc/cp-kafka:7.3.0
+    container_name: kafka-broker
+    ports:
+      - "9092:9092"
+    depends_on:
+      - zookeeper
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_INTERNAL:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092,PLAINTEXT_INTERNAL://broker:29092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+
 #services.storages
   serv-storage-mssql:
     container_name: serv-storage-mssql
@@ -10,8 +35,8 @@ services:
     environment:
       - MSSQL_SA_PASSWORD=Sample123!
       - ACCEPT_EULA=Y
-    networks:
-      - ozon-net
+    #networks:
+    #  - ozon-net
 
   serv-storage-grpc:
     container_name: serv-storage-grpc
@@ -20,69 +45,69 @@ services:
       dockerfile: ./Services/Services.Storage/Storage.Grpc/Dockerfile
     ports:
       - "5010:5010"
-    networks:
-      - ozon-net
+    #networks:
+    #  - ozon-net
     depends_on:
       - serv-storage-mssql
 
-#services.accounts
-  serv-accounts-mssql:
-    container_name: serv-accounts-mssql
-    image: mcr.microsoft.com/mssql/server
-    ports:
-      - "7070:1433"
-    environment:
-      - MSSQL_SA_PASSWORD=Sample123!
-      - ACCEPT_EULA=Y
-    networks:
-      - ozon-net
+##services.accounts
+#  serv-accounts-mssql:
+#    container_name: serv-accounts-mssql
+#    image: mcr.microsoft.com/mssql/server
+#    ports:
+#      - "7070:1433"
+#    environment:
+#      - MSSQL_SA_PASSWORD=Sample123!
+#      - ACCEPT_EULA=Y
+#    networks:
+#      - ozon-net
 
-  serv-accounts-grpc:
-    container_name: serv-accounts-grpc
-    build: 
-      context: .
-      dockerfile: ./Services/Services.Accounts/Accounts.Grpc/Dockerfile
-    ports:
-      - "5005:5005"
-    networks:
-      - ozon-net
-    depends_on:
-      - serv-accounts-mssql
+#  serv-accounts-grpc:
+#    container_name: serv-accounts-grpc
+#    build: 
+#      context: .
+#      dockerfile: ./Services/Services.Accounts/Accounts.Grpc/Dockerfile
+#    ports:
+#      - "5005:5005"
+#    networks:
+#      - ozon-net
+#    depends_on:
+#      - serv-accounts-mssql
 
-#services.auth
-  serv-auth-redis:
-    container_name: serv-auth-redis
-    image: redis
-    networks:
-      - ozon-net
-    ports:
-      - "9443:9443"
-      - "6379:6379"
+##services.auth
+#  serv-auth-redis:
+#    container_name: serv-auth-redis
+#    image: redis
+#    networks:
+#      - ozon-net
+#    ports:
+#      - "9443:9443"
+#      - "6379:6379"
 
-  serv-auth-grpc:
-    container_name: serv-auth-grpc
-    build: 
-      context: .
-      dockerfile: ./Services/Services.Authorization/Dockerfile
-    networks:
-      - ozon-net
-    depends_on:
-      - serv-auth-redis
-    ports:
-      - "5000:5000"
+#  serv-auth-grpc:
+#    container_name: serv-auth-grpc
+#    build: 
+#      context: .
+#      dockerfile: ./Services/Services.Authorization/Dockerfile
+#    networks:
+#      - ozon-net
+#    depends_on:
+#      - serv-auth-redis
+#    ports:
+#      - "5000:5000"
 
-#api
-  ozon-api:
-    container_name: ozon-api
-    build: 
-      context: .
-      dockerfile: ./Ozon.Api/Dockerfile
-    networks:
-      - ozon-net
-    ports:
-      - "9095:80"
-      - "9096:443"
+##api
+#  ozon-api:
+#    container_name: ozon-api
+#    build: 
+#      context: .
+#      dockerfile: ./Ozon.Api/Dockerfile
+#    networks:
+#      - ozon-net
+#    ports:
+#      - "9095:80"
+#      - "9096:443"
 
-networks:
-  ozon-net:
-    driver: bridge
+#networks:
+#  ozon-net:
+#    driver: bridge

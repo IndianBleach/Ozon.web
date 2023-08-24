@@ -3,10 +3,13 @@ using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.EntityFrameworkCore;
 using Products.Data.Context;
 using Products.Grpc.Services;
+using Storage.Grpc.Kafka;
 using Storage.Infrastructure.Repositories;
 using System.Net;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddHostedService<BackgroundConsumerService>();
 
 var connection = builder.Configuration.GetConnectionString("MssqlConnectionString");
 
