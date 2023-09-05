@@ -41,7 +41,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Products.Infrastructure", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Storage.Infrastructure", "Services\Services.Storage\Storage.Infrastructure\Storage.Infrastructure.csproj", "{40395149-E422-4CEB-95D3-429164410CE6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ozon.SeedClient", "Ozon.SeedClient\Ozon.SeedClient.csproj", "{EA8DE47D-C4A0-4640-8FCD-AA9FCE69FA87}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ozon.SeedClient", "Ozon.SeedClient\Ozon.SeedClient.csproj", "{EA8DE47D-C4A0-4640-8FCD-AA9FCE69FA87}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ozon.ClickHouse", "Ozon.ClickHouse\Ozon.ClickHouse.csproj", "{13E4E6DB-0668-421D-A2D5-1602AF6A5D88}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Marketplace.Infrastructure", "Services\Services.Marketplace\Marketplace.Infrastructure\Marketplace.Infrastructure.csproj", "{7982567E-7FC9-4389-876E-3EC435EF560B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -109,6 +113,14 @@ Global
 		{EA8DE47D-C4A0-4640-8FCD-AA9FCE69FA87}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EA8DE47D-C4A0-4640-8FCD-AA9FCE69FA87}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EA8DE47D-C4A0-4640-8FCD-AA9FCE69FA87}.Release|Any CPU.Build.0 = Release|Any CPU
+		{13E4E6DB-0668-421D-A2D5-1602AF6A5D88}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{13E4E6DB-0668-421D-A2D5-1602AF6A5D88}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{13E4E6DB-0668-421D-A2D5-1602AF6A5D88}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{13E4E6DB-0668-421D-A2D5-1602AF6A5D88}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7982567E-7FC9-4389-876E-3EC435EF560B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7982567E-7FC9-4389-876E-3EC435EF560B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7982567E-7FC9-4389-876E-3EC435EF560B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7982567E-7FC9-4389-876E-3EC435EF560B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -126,6 +138,7 @@ Global
 		{CA639026-5054-4A97-B79A-F2C2EA2016AD} = {6D4CDFB0-ABA6-493D-BFD5-678270AE628A}
 		{F137914A-7A43-4C35-87CA-17D59547140C} = {6D4CDFB0-ABA6-493D-BFD5-678270AE628A}
 		{40395149-E422-4CEB-95D3-429164410CE6} = {ECC3CAB6-D8CA-4AB5-8CFA-D2249DA2624E}
+		{7982567E-7FC9-4389-876E-3EC435EF560B} = {6359F63D-B224-4E84-9FD2-F0370E5FF69B}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {C692CB65-4CC5-4FC4-8A02-E15A5E53562F}

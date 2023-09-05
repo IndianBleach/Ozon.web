@@ -9,6 +9,7 @@ using Data.Entities;
 using Grpc.Accounts;
 using Grpc.Accounts.Common;
 using Grpc.Core;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace Accounts.Grpc.GrpcServices
 {
@@ -20,14 +21,18 @@ namespace Accounts.Grpc.GrpcServices
 
         private readonly IServiceRepository<ApplicationUser> _userRepository;
 
+        private readonly ILogger<UserAccountGrpc> _logger;
+
         public UserAccountGrpc(
             IServiceRepository<ApplicationUser> userRepository,
             IServiceRepository<UserRole> roleRepository,
-            IServiceRepository<UserAccount> accountRepository)
+            IServiceRepository<UserAccount> accountRepository,
+            ILogger<UserAccountGrpc> logger)
         {
             _userRepository = userRepository;
             _accountRepository = accountRepository;
             _roleRepository = roleRepository;
+            _logger = logger;
         }
 
         public override async Task<CreateRoleRespone> CreateRole(CreateRoleRequest request, ServerCallContext context)
@@ -38,6 +43,8 @@ namespace Accounts.Grpc.GrpcServices
             QueryResult<UserRole> query = _roleRepository.Create(role);
 
             if (!query.IsSuccessed)
+            {
+                _logger.LogError($"[create role] {request.RoleName}");
                 return new CreateRoleRespone
                 {
                     QueryState = new QueryResultState
@@ -46,6 +53,7 @@ namespace Accounts.Grpc.GrpcServices
                         ErrorMessage = query.StatusMessage
                     }
                 };
+            }
 
             return new CreateRoleRespone
             {
@@ -64,6 +72,8 @@ namespace Accounts.Grpc.GrpcServices
             QueryResult<ApplicationUser> query = _userRepository.Create(user);
 
             if (!query.IsSuccessed)
+            {
+                _logger.LogError($"[create user] {request.FirstName}");
                 return new CreateCreateUserResponse
                 {
                     QueryState = new QueryResultState
@@ -72,7 +82,9 @@ namespace Accounts.Grpc.GrpcServices
                         IsSuccessed = false
                     }
                 };
+            }
 
+            _logger.LogError($"[create user (success)] {query.Value.Id}");
             return new CreateCreateUserResponse
             {
                 UserId = query.Value.Id
@@ -84,6 +96,8 @@ namespace Accounts.Grpc.GrpcServices
             ISpecification<UserRole> spec = new RoleByNameSpec("client");
 
             UserRole? getRole = _roleRepository.FirstOrDefault(spec);
+
+            _logger.LogError($"[ client role]= {getRole?.Name}");
 
             if (getRole == null)
                 return new CreateClientUserAccountResponse
@@ -102,6 +116,8 @@ namespace Accounts.Grpc.GrpcServices
                 getRole.Id);
 
             QueryResult<UserAccount> createQuery = _accountRepository.Create(account);
+
+            _logger.LogError($"[create user ({createQuery.IsSuccessed})] accid= {createQuery.Value?.Id}");
 
             if (!createQuery.IsSuccessed)
                 return new CreateClientUserAccountResponse

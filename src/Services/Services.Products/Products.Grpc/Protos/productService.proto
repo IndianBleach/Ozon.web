@@ -14,6 +14,8 @@ package Grpc.Protos.Products;
 
 service ProductServiceGrpc {
 
+  rpc GetAllProducts (GetAllProductsRequest) returns (GetAllProductsResponse);
+
   rpc CreateProduct (CreateProductRequest) returns (GlobalGrpc.QueryStringIdResult);
 
   rpc CreateProductSeller (CreateProductSellerRequest) returns (GlobalGrpc.QueryStringIdResult);

@@ -9,10 +9,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Protos\Accounts\accountSecurityService.proto" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="Google.Protobuf" Version="3.24.1" />
     <PackageReference Include="Grpc.Net.Client" Version="2.55.0" />
     <PackageReference Include="Grpc.Tools" Version="2.57.0">
@@ -33,6 +29,12 @@
 	<Protobuf Include="Protos\Accounts\accountSecurityService.proto" GrpcServices="Client" />
 	<Protobuf Include="Protos\Accounts\accountService.proto" GrpcServices="Client" />
 	<Protobuf Include="Protos\Accounts\accountCommon.proto" />
+	<Protobuf Include="Protos\Products\products.proto">
+	  <AdditionalImportDirs>..\Common\Grpc</AdditionalImportDirs>
+	</Protobuf>
+	<Protobuf Include="Protos\Products\productService.proto" GrpcServices="Client">
+	  <AdditionalImportDirs>..\Common\Grpc</AdditionalImportDirs>
+	</Protobuf>
 	<Protobuf Include="Protos\Storages\storages.proto">
 	  <AdditionalImportDirs>..\Common\Grpc</AdditionalImportDirs>
 	</Protobuf>

@@ -1,5 +1,6 @@
 ﻿using Common.DataQueries;
 using GlobalGrpc;
+using Google.Protobuf.WellKnownTypes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,8 +11,6 @@ namespace Common.Grpc.Extensions
 {
     public static class GrpcGlobalTools
     {
-        
-
         public static QueryStringIdResult FromQueryResult(QueryResult<string> query)
         {
             if (!query.IsSuccessed || string.IsNullOrEmpty(query.Value))
@@ -49,7 +48,27 @@ namespace Common.Grpc.Extensions
         }
 
 
-        public static QueryStringIdResult Failure(string? errorMessage)
+        public static QueryIntIdResult FailureIntId(string? errorMessage)
+        {
+            return new QueryIntIdResult()
+            {
+                FailureValue = new QueryErrorResult()
+                {
+                    ErrorMessage = errorMessage,
+                    IsSuccessed = false
+                }
+            };
+        }
+
+        public static QueryIntIdResult SuccessIntId(int valueId)
+        {
+            return new QueryIntIdResult()
+            {
+                SuccessValueId = valueId,
+            };
+        }
+
+        public static QueryStringIdResult FailureStringId(string? errorMessage)
         {
             return new QueryStringIdResult()
             {
@@ -61,7 +80,7 @@ namespace Common.Grpc.Extensions
             };
         }
 
-        public static QueryStringIdResult Success(string valueId)
+        public static QueryStringIdResult SuccessStringId(string valueId)
         {
             return new QueryStringIdResult()
             {

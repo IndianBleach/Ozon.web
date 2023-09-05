@@ -23,6 +23,23 @@ namespace Products.Grpc.Services
             _sellerRepository = sellerRepository;
         }
 
+        public override async Task<GetAllProductsResponse> GetAllProducts(GetAllProductsRequest request, ServerCallContext context)
+        {
+            GetAllProductsResponse resp = new GetAllProductsResponse();
+            
+            foreach (Product item in _productRepository.GetAll())
+            {
+                resp.Products.Add(new ProductShortRead()
+                { 
+                    Id = item.Id,
+                    SpecialCode = item.Id,
+                    Title = item.Title
+                });
+            }
+
+            return resp;
+        }
+
         public override async Task<QueryStringIdResult> CreateProductSeller(CreateProductSellerRequest request, ServerCallContext context)
         {
             ProductSeller seller = new ProductSeller(
@@ -45,7 +62,7 @@ namespace Products.Grpc.Services
                 x => x.Id == request.SellerId);
 
             if (!sellerExists)
-                return GrpcGlobalTools.Failure("seller doesn't exists");
+                return GrpcGlobalTools.FailureStringId("seller doesn't exists");
 
             Product product = new Product(
                 title: request.DefaultTitle,

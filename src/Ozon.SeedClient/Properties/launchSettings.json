@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "Ozon.SeedClient": {
+      "commandName": "Project"
+    },
+    "Docker": {
+      "commandName": "Docker"
+    }
+  }
+}

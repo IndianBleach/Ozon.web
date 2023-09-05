@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Products.Data.Entities.Address
+namespace Storage.Data.Entities.Address
 {
     public class AddressPoint : TEntity
     {

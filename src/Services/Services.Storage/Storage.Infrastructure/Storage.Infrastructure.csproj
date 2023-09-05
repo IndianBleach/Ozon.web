@@ -11,8 +11,4 @@
     <ProjectReference Include="..\Storage.Data\Storage.Data.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Specifications\" />
-  </ItemGroup>
-
 </Project>

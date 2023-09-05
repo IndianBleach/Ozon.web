@@ -8,7 +8,7 @@ using System.Net;
 
 var builder = WebApplication.CreateBuilder(args);
 
-var connection = "";
+var connection = builder.Configuration.GetConnectionString("MssqlConnectionString");
 
 if (string.IsNullOrEmpty(connection))
 {
@@ -27,7 +27,7 @@ builder.Services.AddGrpc();
 
 builder.WebHost.ConfigureKestrel(option =>
 {
-    option.Listen(IPAddress.Any, 5006, x => x.Protocols = HttpProtocols.Http2);
+    option.Listen(IPAddress.Any, int.Parse(builder.Configuration["GrpcConfig:Http2Port"]), x => x.Protocols = HttpProtocols.Http2);
 });
 
 

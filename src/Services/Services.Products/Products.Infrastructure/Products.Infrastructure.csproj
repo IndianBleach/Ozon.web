@@ -7,12 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Specifications\" />
+    <ProjectReference Include="..\..\..\Common\Common.csproj" />
+    <ProjectReference Include="..\Products.Data\Products.Data.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Common\Common.csproj" />
-    <ProjectReference Include="..\Products.Data\Products.Data.csproj" />
+    <Folder Include="Specifications\" />
   </ItemGroup>
 
 </Project>

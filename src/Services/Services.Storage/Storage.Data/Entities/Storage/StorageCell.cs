@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Products.Data.Entities.Storage
+namespace Storage.Data.Entities.Storage
 {
     public class StorageCell : TEntity
     {
@@ -12,14 +12,14 @@ namespace Products.Data.Entities.Storage
 
         public string? Commentary { get; set; }
 
-        public string StorageId { get; set; }
+        public int StorageId { get; set; }
 
         public MarketStorage? Storage { get; set; }
 
         public StorageCell(
             string cellNumber,
             string? commentary,
-            string storageId)
+            int storageId)
         {
             CellNumber = cellNumber;
             Commentary = commentary;

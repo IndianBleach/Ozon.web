@@ -7,14 +7,18 @@
     <UserSecretsId>92f497c8-6e2d-46b3-9f51-15ff9afc353b</UserSecretsId>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     <DockerfileContext>..\..\..</DockerfileContext>
+
+	<EnableUnsafeBinaryFormatterSerialization>true</EnableUnsafeBinaryFormatterSerialization>
   </PropertyGroup>
 
+	
   <ItemGroup>
     <None Remove="Protos\storages.proto" />
     <None Remove="Protos\storageService.proto" />
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="ClickHouse.Client" Version="6.7.4" />
     <PackageReference Include="Confluent.Kafka" Version="2.2.0" />
     <PackageReference Include="Google.Protobuf" Version="3.24.1" />
     <PackageReference Include="Grpc.AspNetCore" Version="2.40.0" />
@@ -28,6 +32,7 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="7.0.10" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="7.0.10" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.15.1" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
   </ItemGroup>
 
   <ItemGroup>
@@ -37,7 +42,7 @@
   </ItemGroup>
 
 	<ItemGroup>
-		<Protobuf Include="..\..\..\Common\Grpc\quries.proto" GrpcServices="None" ProtoCompile="False" Link="Common\Grpc\quries.proto" />
+		<Protobuf Include="..\..\..\Common\Grpc\queries.proto" GrpcServices="None" ProtoCompile="False" Link="Common\Grpc\quries.proto" />
 		<Protobuf GrpcServices="Server" Include="Protos\storageService.proto" AdditionalImportDirs="..\..\..\Common\Grpc" />
 		<Protobuf Include="Protos\storages.proto" GrpcServices="Server">
 		  <AdditionalImportDirs>..\..\..\Common\Grpc</AdditionalImportDirs>

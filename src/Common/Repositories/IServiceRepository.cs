@@ -17,5 +17,7 @@ namespace Common.Repositories
         IEnumerable<T> Find(ISpecification<T> specification);
 
         bool Any(Func<T, bool> predicate);
+
+        IEnumerable<T> GetAll();
     }
 }

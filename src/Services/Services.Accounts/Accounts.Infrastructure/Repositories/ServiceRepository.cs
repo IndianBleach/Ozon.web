@@ -51,5 +51,10 @@ namespace Accounts.Infrastructure.Repositories
             return SpecificationBuilder<T>.GetQuery(_dbContext.Set<T>().AsQueryable(), spec)
                 .FirstOrDefault();
         }
+
+        public IEnumerable<T> GetAll()
+        {
+            return _dbContext.Set<T>();
+        }
     }
 }

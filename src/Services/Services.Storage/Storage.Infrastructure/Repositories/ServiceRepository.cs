@@ -1,8 +1,8 @@
 ﻿using Common.DataQueries;
 using Common.Repositories;
 using Common.Specifications;
-using Products.Data.Context;
-using Products.Data.Entities;
+using Storage.Data.Context;
+using Storage.Data.Entities;
 
 namespace Storage.Infrastructure.Repositories
 {
@@ -45,6 +45,11 @@ namespace Storage.Infrastructure.Repositories
         {
             return SpecificationBuilder<T>.GetQuery(_dbContext.Set<T>().AsQueryable(), spec)
                 .FirstOrDefault();
+        }
+
+        public IEnumerable<T> GetAll()
+        {
+            return _dbContext.Set<T>();
         }
     }
 }

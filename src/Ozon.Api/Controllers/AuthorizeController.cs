@@ -61,6 +61,8 @@ namespace Ozon.Api.Controllers
                 SecondName = model.SecondName
             });
 
+            _logger.LogInformation("[UserId] " + res.UserId);
+
             if (res.HasUserId)
             {
                 var accountResult = accountClient.CreateClientAccount(new CreateClientUserAccountRequest
@@ -69,6 +71,8 @@ namespace Ozon.Api.Controllers
                     UserName = model.UserName,
                     UserPassword = model.Password
                 });
+
+                _logger.LogInformation("[AccountId] " + accountResult.UserAccountId);
 
                 var resp = authClient.JWTSignIn(new JwtSignInRequest
                 {
@@ -79,7 +83,7 @@ namespace Ozon.Api.Controllers
                 return Ok(resp);
             }
 
-            return Ok();
+            return Ok(res);
         }
 
         [HttpPost("signin")]
@@ -95,6 +99,8 @@ namespace Ozon.Api.Controllers
                 InputPassword = userModel.UserInputPassword,
                 UserLogin = userModel.UserName
             });
+
+            _logger.LogInformation("[check logpass] accid " + result.UserData?.AccountId);
 
             if (result.QueryState != null &&
                 result.QueryState.IsSuccessed == false)

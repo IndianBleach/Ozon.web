@@ -1,17 +1,17 @@
 ﻿
 using Common.DataQueries;
 using GlobalGrpc;
-using Products.Data.Entities;
+using Storage.Data.Entities;
 
-namespace Products.Grpc.GrpcUtils
+namespace Storage.Grpc.GrpcUtils
 {
     public static class GrpcProductStorageServiceExtensions
     {
-        public static QueryStringIdResult FromQueryResult<T>(this QueryResult<T> query)
-            where T : Products.Data.Entities.TEntity
+        public static QueryIntIdResult FromQueryResult<T>(this QueryResult<T> query)
+            where T : Storage.Data.Entities.TEntity
         {
-            if (!query.IsSuccessed || string.IsNullOrEmpty(query.Value.Id))
-                return new QueryStringIdResult
+            if (!query.IsSuccessed)
+                return new QueryIntIdResult
                 {
                     FailureValue = new QueryErrorResult
                     {
@@ -20,7 +20,7 @@ namespace Products.Grpc.GrpcUtils
                     }
                 };
 
-            return new QueryStringIdResult
+            return new QueryIntIdResult
             {
                 SuccessValueId = query.Value.Id,
             };
