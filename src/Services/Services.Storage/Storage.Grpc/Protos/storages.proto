@@ -1,0 +1,128 @@
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+
+import "queries.proto";
+
+option csharp_namespace = "Grpc.Protos.Storages";
+
+package Grpc.Protos.Storages;
+
+
+
+
+message GetStorageCellsResponse {
+    repeated StorageCellRead Cells = 1;
+}
+message GetStorageCellsRequest {
+    int32 storage_id = 1;
+}
+message StorageCellRead {
+    int32 cell_id = 1;
+    string cell_number = 2;
+}
+
+
+message StorageProductRead {
+    string external_product_id = 1;
+    int32 in_storage_product_id = 2;
+}
+message GetStorageProductsRequest {
+    int32 storage_id = 1;
+}
+message GetStorageProductsResponse {
+    int32 storage_id = 1;
+    repeated StorageProductRead Products = 2;
+}
+
+
+message AddStorageProductRequest {
+    string external_product_id = 1;
+    int32 income_count = 2;
+    int32 storage_id = 3;
+}
+
+
+message CreateStorageActionRequest {
+    string action_name = 1;
+}
+
+
+message GetAllStorageEmployeesRequest {
+    int32 storage_id = 1;
+}
+message GetAllStorageEmployeesResponse {
+    repeated StorageEmployeeRead employees = 1; 
+}
+
+
+message StorageEmployeeRead {
+    string user_account_id = 1;
+    int32 storage_id = 2;
+    int32 storage_employee_id = 3;
+}
+
+message CreateStorageEmployeeRequest {
+    string user_account_id = 1;
+    int32 storage_id = 2;
+}
+
+
+message GetAllStorageActionsResponse {
+    repeated StorageActionTypeRead actions = 1;
+}
+message GetAllStorageActionsRequest {}
+message StorageActionTypeRead {
+    int32 action_id = 1;
+    string name = 2;
+}
+
+
+message GetAllStoragesResponse {
+    repeated MarketStorageShortRead storages = 1;
+}
+
+message GetAllStoragesRequest
+{}
+
+message MarketStorageShortRead {
+    int32 storage_id = 1;
+}
+
+
+
+
+message CreateStorageCellRequest {
+    int32 storage_id = 1;
+    string number_title = 2;
+    string comment = 3;
+}
+
+
+message CreateAddrRequest {
+    string city_addr = 1;
+    string street_addr = 2;
+    string building_addr = 3;
+}
+
+
+message CreateMarketStorageRequest {
+    CreateAddrRequest addr = 1;
+}
+
+
+message StorageAddrRead {
+    string city_addr = 1;
+    string street_addr = 2;
+    string building_addr = 3;
+}
+
+message MarketStorageRead {
+    int32 storage_id = 1;
+    StorageAddrRead storage_addr = 2;
+}
+
+
+
+
+

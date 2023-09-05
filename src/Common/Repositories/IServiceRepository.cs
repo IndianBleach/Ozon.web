@@ -8,12 +8,16 @@ using System.Threading.Tasks;
 
 namespace Common.Repositories
 {
-    public interface IServiceRepository<T>
+    public interface IServiceRepository<T> where T : class
     {
-        QueryResult<string> Create(T entity);
+        QueryResult<T> Create(T entity);
 
         T? FirstOrDefault(ISpecification<T> spec);
 
-        IEnumerable<T> FindBy(ISpecification<T> specification);
+        IEnumerable<T> Find(ISpecification<T> specification);
+
+        bool Any(Func<T, bool> predicate);
+
+        IEnumerable<T> GetAll();
     }
 }

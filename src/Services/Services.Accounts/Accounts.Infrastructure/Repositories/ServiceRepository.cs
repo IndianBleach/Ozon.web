@@ -11,7 +11,7 @@ using User.Data.Context;
 
 namespace Accounts.Infrastructure.Repositories
 {
-    public class ServiceRepository<T> : IServiceRepository<T> where T : TEntity
+    public class ServiceRepository<T> : IServiceRepository<T> where T : Data.Entities.TEntity
     {
         private readonly ApplicationContext _dbContext;
 
@@ -20,7 +20,12 @@ namespace Accounts.Infrastructure.Repositories
             _dbContext = dbContext;
         }
 
-        public QueryResult<string> Create(T entity)
+        public bool Any(Func<T, bool> predicate)
+        {
+            return _dbContext.Set<T>().Any(predicate);
+        }
+
+        public QueryResult<T> Create(T entity)
         {
             try
             {
@@ -28,15 +33,15 @@ namespace Accounts.Infrastructure.Repositories
 
                 _dbContext.SaveChanges();
 
-                return QueryResult<string>.Successed(entity.Id);
+                return QueryResult<T>.Successed(entity);
             }
             catch (Exception exp)
             {
-                return QueryResult<string>.Failure(exp.Message);
+                return QueryResult<T>.Failure(exp.Message);
             }
         }
 
-        public IEnumerable<T> FindBy(ISpecification<T> specification)
+        public IEnumerable<T> Find(ISpecification<T> specification)
         {
             return SpecificationBuilder<T>.GetQuery(_dbContext.Set<T>().AsQueryable(), specification);
         }
@@ -45,6 +50,11 @@ namespace Accounts.Infrastructure.Repositories
         {
             return SpecificationBuilder<T>.GetQuery(_dbContext.Set<T>().AsQueryable(), spec)
                 .FirstOrDefault();
+        }
+
+        public IEnumerable<T> GetAll()
+        {
+            return _dbContext.Set<T>();
         }
     }
 }

@@ -33,7 +33,7 @@ builder.Services.Scan(scan => scan.FromCallingAssembly()
 
 builder.WebHost.ConfigureKestrel(option =>
 {
-    option.ListenAnyIP(6000, o => o.Protocols = HttpProtocols.Http2);
+    option.ListenAnyIP(5000, o => o.Protocols = HttpProtocols.Http2);
 });
 
 var app = builder.Build();

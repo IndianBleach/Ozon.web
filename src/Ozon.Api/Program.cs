@@ -17,7 +17,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(opt =>
     {
-        opt.Audience = JWTConfigOptions.AUDINCE;
+        //opt.Audience = JWTConfigOptions.AUDINCE;
         opt.RequireHttpsMetadata = false;
         opt.TokenValidationParameters = new TokenValidationParameters
         {
@@ -46,6 +46,7 @@ app.UseSwaggerUI();
 
 //app.UseHttpsRedirection();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

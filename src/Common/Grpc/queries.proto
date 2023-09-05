@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+option csharp_namespace = "GlobalGrpc";
+
+package GlobalGrpc;
+
+message QueryErrorResult {
+    string error_message = 1;
+    bool is_successed = 2;
+}
+
+message QueryStringIdResult {
+    oneof query_result {
+        string success_value_id = 1;
+        QueryErrorResult failure_value = 2;
+    }
+}
+
+message QueryIntIdResult {
+    oneof query_result {
+        int32 success_value_id = 1;
+        QueryErrorResult failure_value = 2;
+    }
+}

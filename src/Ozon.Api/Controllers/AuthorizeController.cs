@@ -16,11 +16,17 @@ namespace Ozon.Api.Controllers
 
         private GrpcChannel _accountChannel;
 
-        public AuthorizeController(ILogger<AuthorizeController> logger)
+        public AuthorizeController(
+            ILogger<AuthorizeController> logger,
+            IConfiguration config)
         {
             _logger = logger;
-            _authChannel = GrpcChannel.ForAddress("http://serv-auth-grpc:6000");
-            _accountChannel = GrpcChannel.ForAddress("http://serv-accounts-grpc:5000");
+            string s1 = config["Services:Authorization:GrpcConnectionString"];
+
+            _authChannel = GrpcChannel.ForAddress(s1);
+
+            string s2 = config["Services:Accounts:GrpcConnectionString"];
+            _accountChannel = GrpcChannel.ForAddress(s2);
         }
 
         [HttpPost("role")]
@@ -55,6 +61,8 @@ namespace Ozon.Api.Controllers
                 SecondName = model.SecondName
             });
 
+            _logger.LogInformation("[UserId] " + res.UserId);
+
             if (res.HasUserId)
             {
                 var accountResult = accountClient.CreateClientAccount(new CreateClientUserAccountRequest
@@ -63,6 +71,8 @@ namespace Ozon.Api.Controllers
                     UserName = model.UserName,
                     UserPassword = model.Password
                 });
+
+                _logger.LogInformation("[AccountId] " + accountResult.UserAccountId);
 
                 var resp = authClient.JWTSignIn(new JwtSignInRequest
                 {
@@ -73,7 +83,7 @@ namespace Ozon.Api.Controllers
                 return Ok(resp);
             }
 
-            return Ok();
+            return Ok(res);
         }
 
         [HttpPost("signin")]
@@ -89,6 +99,8 @@ namespace Ozon.Api.Controllers
                 InputPassword = userModel.UserInputPassword,
                 UserLogin = userModel.UserName
             });
+
+            _logger.LogInformation("[check logpass] accid " + result.UserData?.AccountId);
 
             if (result.QueryState != null &&
                 result.QueryState.IsSuccessed == false)

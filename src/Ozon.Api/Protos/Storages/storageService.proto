@@ -1,0 +1,42 @@
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+
+import "queries.proto";
+
+import "Protos/Storages/storages.proto";
+
+option csharp_namespace = "Grpc.Protos.Storages";
+
+package Grpc.Protos.Storages;
+
+
+
+
+service StorageServiceGrpc {
+
+  rpc GetStorageCells (GetStorageCellsRequest) returns (GetStorageCellsResponse);
+
+  rpc GetStorageProducts (GetStorageProductsRequest) returns (GetStorageProductsResponse);
+
+  rpc AddStorageProduct (AddStorageProductRequest) returns (GlobalGrpc.QueryIntIdResult);
+
+  rpc CreateStorageAction (CreateStorageActionRequest) returns (GlobalGrpc.QueryIntIdResult);
+
+  rpc GetAllStorageEmployees (GetAllStorageEmployeesRequest) returns (GetAllStorageEmployeesResponse);
+
+  rpc CreateStorageEmployee (CreateStorageEmployeeRequest) returns (GlobalGrpc.QueryIntIdResult);
+
+  rpc GetAllStorageActions (GetAllStorageActionsRequest) returns (GetAllStorageActionsResponse);
+ 
+  rpc GetAllStorages (GetAllStoragesRequest) returns (GetAllStoragesResponse);
+
+  rpc CreateMarketStorage (CreateMarketStorageRequest) returns (GlobalGrpc.QueryIntIdResult);
+
+  rpc CreateStorageCell (CreateStorageCellRequest) returns (GlobalGrpc.QueryIntIdResult);
+
+}
+
+
+
+

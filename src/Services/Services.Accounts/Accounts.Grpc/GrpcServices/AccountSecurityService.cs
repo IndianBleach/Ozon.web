@@ -12,9 +12,13 @@ namespace Accounts.Grpc.GrpcServices
     {
         private readonly IServiceRepository<UserAccount> _accountRepository;
 
+        private readonly ILogger<AccountSecurityService> _logger;
+
         public AccountSecurityService(
-            IServiceRepository<UserAccount> accountRepository)
+            IServiceRepository<UserAccount> accountRepository,
+             ILogger<AccountSecurityService> logger)
         {
+            _logger = logger;
             _accountRepository = accountRepository;
         }
 
@@ -25,6 +29,8 @@ namespace Accounts.Grpc.GrpcServices
             var user = _accountRepository.FirstOrDefault(spec);
 
             bool valid = user != null && user.PasswordHash.Equals(request.InputPassword);
+
+            _logger.LogInformation("[check-logpass] + " + valid.ToString() + $" pass: {request.InputPassword}, login: {request.UserLogin}");
 
             if (!valid)
                 return new CheckLogPassResponse
