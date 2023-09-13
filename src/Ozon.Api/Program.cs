@@ -11,6 +11,37 @@ builder.Services.AddCors();
 builder.Services.AddControllers();
 
 
+// REVERSE PROXY
+builder.Services.AddReverseProxy()
+    .LoadFromConfig(builder.Configuration.GetSection("ReverseProxy"));
+
+builder.Services.AddHttpClient("Accounts", client =>
+{
+    client.BaseAddress = new Uri("https://localhost:5001/accounts/");
+});
+
+builder.Services.AddHttpClient("Storages", client =>
+{
+    client.BaseAddress = new Uri("https://localhost:5001/storages/");
+});
+
+builder.Services.AddHttpClient("Authorize", client =>
+{
+    client.BaseAddress = new Uri("https://localhost:5001/authorize/");
+});
+
+builder.Services.AddHttpClient("Products", client =>
+{
+    client.BaseAddress = new Uri("https://localhost:5001/products/");
+});
+
+builder.Services.AddHttpClient("Catalogs", client =>
+{
+    client.BaseAddress = new Uri("https://localhost:5001/catalogs/");
+});
+///////////
+
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
