@@ -2,6 +2,7 @@
 using Common.DataQueries;
 using Common.Repositories;
 using Common.Specifications;
+using Microsoft.EntityFrameworkCore.Storage;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -55,6 +56,11 @@ namespace Accounts.Infrastructure.Repositories
         public IEnumerable<T> GetAll()
         {
             return _dbContext.Set<T>();
+        }
+
+        public IDbContextTransaction NewTransaction()
+        {
+            return _dbContext.Database.BeginTransaction();
         }
     }
 }
