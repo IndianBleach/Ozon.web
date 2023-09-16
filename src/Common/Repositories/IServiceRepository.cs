@@ -1,5 +1,6 @@
 ﻿using Common.DataQueries;
 using Common.Specifications;
+using Microsoft.EntityFrameworkCore.Storage;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,5 +20,7 @@ namespace Common.Repositories
         bool Any(Func<T, bool> predicate);
 
         IEnumerable<T> GetAll();
+
+        IDbContextTransaction NewTransaction();
     }
 }

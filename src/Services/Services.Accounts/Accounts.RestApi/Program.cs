@@ -1,5 +1,6 @@
 using Accounts.Infrastructure.HelpServices;
 using Accounts.Infrastructure.Repositories;
+using Common.Config;
 using Common.Repositories;
 using Microsoft.EntityFrameworkCore;
 using User.Data.Context;
@@ -26,9 +27,9 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddSingleton(new JwtHelpService(
-    key: builder.Configuration["PasswordHasher:jwtKey"],
-    issuer: builder.Configuration["PasswordHasher:jwtIssuer"],
-    audince: builder.Configuration["PasswordHasher:jwtAudince"]));
+    key: JWTAccountsConfigOptions.SECRET_KEY,
+    issuer: JWTAccountsConfigOptions.ISSUER,
+    audince: JWTAccountsConfigOptions.AUDINCE));
 
 builder.Services.AddSingleton(new PasswordHashHelpService(
     hashSalt: builder.Configuration["PasswordHasher:hashSalt"]));

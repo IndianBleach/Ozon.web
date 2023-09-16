@@ -13,9 +13,6 @@ namespace Ozon.Api.Controllers
         public ProductsController(IConfiguration config)
         {
             Console.WriteLine("[CTOR (products)] " + DateTime.Now);
-
-            _productsChannel = GrpcChannel.ForAddress(
-                address: config["Services:Products:GrpcConnectionString"]);
         }
 
         [HttpPost("/[controller]/sellers")]

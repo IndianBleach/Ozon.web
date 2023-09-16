@@ -23,7 +23,6 @@ namespace Ozon.Api.Controllers
         public StoragesController(IConfiguration config)
         {
             _config = config;
-            _grpcChannel = GrpcChannel.ForAddress(_config["Services:Storage:GrpcConnectionString"]);
         }
 
         [HttpGet("/[controller]/{storage_id:int}/products")]

@@ -10,8 +10,9 @@ using Ozon.Common.Logging;
 
 namespace Accounts.RestApi.Controllers
 {
-    [ApiController]
+    //[ApiController]
     [Route("[controller]")]
+    [Produces("application/json")]
     public class AccountsController : ControllerBase
     {
         private readonly IUserAccumulatorService _userAcumService;
@@ -30,7 +31,7 @@ namespace Accounts.RestApi.Controllers
             _logger = logger;
         }
 
-        [HttpPost("/[controller]/roles")]
+        [HttpPost("/roles")]
         public async Task<IActionResult> CreateRole(
             string role_name)
         {
@@ -52,7 +53,7 @@ namespace Accounts.RestApi.Controllers
             query.LogFromQuery(_logger, nameof(RegisterUser));
 
             if (query.IsSuccessed && query.Value != null)
-                return Redirect($"https://localhost:7221/signin?authorize_hash={query.Value.ClaimsToken}");
+                return Redirect($"http://localhost:5001/signin?authorize_token={query.Value.ClaimsToken}");
 
             return BadRequest(query);
         }

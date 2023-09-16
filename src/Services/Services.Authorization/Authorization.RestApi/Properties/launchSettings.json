@@ -1,6 +1,6 @@
 {
   "profiles": {
-    "Accounts.RestApi": {
+    "Authorization.RestApi": {
       "commandName": "Project",
       "launchBrowser": true,
       "launchUrl": "swagger",
@@ -8,7 +8,7 @@
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
       "dotnetRunMessages": true,
-      "applicationUrl": "https://localhost:7171;http://localhost:5231"
+      "applicationUrl": "https://localhost:7221;http://localhost:5125"
     },
     "IIS Express": {
       "commandName": "IISExpress",
@@ -34,8 +34,8 @@
     "windowsAuthentication": false,
     "anonymousAuthentication": true,
     "iisExpress": {
-      "applicationUrl": "http://localhost:17511",
-      "sslPort": 44344
+      "applicationUrl": "http://localhost:41011",
+      "sslPort": 44393
     }
   }
 }

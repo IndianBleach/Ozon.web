@@ -17,27 +17,27 @@ builder.Services.AddReverseProxy()
 
 builder.Services.AddHttpClient("Accounts", client =>
 {
-    client.BaseAddress = new Uri("https://localhost:5001/accounts/");
+    client.BaseAddress = new Uri("http://ozon-api/accounts/");
 });
 
 builder.Services.AddHttpClient("Storages", client =>
 {
-    client.BaseAddress = new Uri("https://localhost:5001/storages/");
+    client.BaseAddress = new Uri("http://ozon-api/storages/");
 });
 
 builder.Services.AddHttpClient("Authorize", client =>
 {
-    client.BaseAddress = new Uri("https://localhost:5001/authorize/");
+    client.BaseAddress = new Uri("http://ozon-api/authorize/");
 });
 
 builder.Services.AddHttpClient("Products", client =>
 {
-    client.BaseAddress = new Uri("https://localhost:5001/products/");
+    client.BaseAddress = new Uri("http://ozon-api/products/");
 });
 
 builder.Services.AddHttpClient("Catalogs", client =>
 {
-    client.BaseAddress = new Uri("https://localhost:5001/catalogs/");
+    client.BaseAddress = new Uri("http://ozon-api/catalogs/");
 });
 ///////////
 
@@ -77,9 +77,16 @@ app.UseSwaggerUI();
 
 //app.UseHttpsRedirection();
 
+app.UseRouting();
+
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapReverseProxy();
+});
 
 app.Run();
