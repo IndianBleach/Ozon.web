@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+
+import "Protos/storages.proto";
+
+option csharp_namespace = "Grpc.Protos.Storages";
+
+package Grpc.Protos.Storages;
+
+
+service StorageGrpcService{
+
+  rpc AddProductsToStorage (stream AddProductToStorageRequest) returns (QueryStringIdResult);
+
+}
