@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Marketplace.Api.Controllers
 {
-    [ApiController]
+    //[ApiController]
     [Route("/[controller]")]
     [Produces("application/json")]
     public class CategoriesController : ControllerBase
@@ -39,7 +39,7 @@ namespace Marketplace.Api.Controllers
         }
 
         [HttpGet("/[controller]")]
-        public async Task<IActionResult> CreateCategory()
+        public async Task<IActionResult> GetALLCategories()
         {
             _logger.LogInformation(nameof(CreateCategory));
 

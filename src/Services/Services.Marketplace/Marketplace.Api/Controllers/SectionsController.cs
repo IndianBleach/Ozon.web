@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Marketplace.Api.Controllers
 {
-    [ApiController]
+    //[ApiController]
     [Route("/[controller]")]
     [Produces("application/json")]
     public class SectionsController : ControllerBase
@@ -76,6 +76,8 @@ namespace Marketplace.Api.Controllers
             var res = _sectionRepository.Create(new CategorySection(
                 categoryId: category_id,
                 name: name));
+
+            _logger.LogWarning($"[sectionId] " + res.Value?.CategoryId);
 
             return Ok(res);
         }

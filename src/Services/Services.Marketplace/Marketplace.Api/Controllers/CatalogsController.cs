@@ -12,7 +12,7 @@ using System.ComponentModel;
 
 namespace Marketplace.Api.Controllers
 {
-    [ApiController]
+    //[ApiController]
     [Route("/")]
     [Produces("application/json")]
     public class CatalogsController : ControllerBase
@@ -54,7 +54,8 @@ namespace Marketplace.Api.Controllers
             _mapper = new Mapper(config);
         }
 
-        // add auth
+
+
 
         [HttpGet("/")]
         public async Task<IActionResult> GetCatalogs()

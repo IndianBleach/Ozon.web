@@ -2,18 +2,17 @@
 using Common.DTOs.ApiRequests;
 using Common.DTOs.Catalog;
 using Common.Repositories;
+using Marketplace.Api.Kafka.Producers;
 using Marketplace.Data.Entities.ProductsEntities;
 using Marketplace.Data.Entities.PropertyEntities;
-using Marketplace.Data.Enums;
 using Marketplace.Infrastructure.Mappers;
 using Marketplace.Infrastructure.Repositories.Products;
-using Marketplace.Infrastructure.Requests;
 using Marketplace.Infrastructure.Specifications.Properties;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Marketplace.Api.Controllers
 {
-    [ApiController]
+    //[ApiController]
     [Route("/[controller]")]
     [Produces("application/json")]
     public class ProductsController : ControllerBase
@@ -26,7 +25,10 @@ namespace Marketplace.Api.Controllers
 
         private readonly IMapper _mapper;
 
+        private IProductRegistryProducer _producer;
+
         public ProductsController(
+            IProductRegistryProducer producer,
             ILogger<ProductsController> logger,
             IServiceRepository<CatalogProduct> productsRepository,
             IProductRepository productRepository)
@@ -38,6 +40,8 @@ namespace Marketplace.Api.Controllers
             var config = new MapperConfiguration(cfg => cfg.AddProfiles(new List<Profile> {
                 new CatalogMapProfile()
             }));
+
+            _producer = producer;
 
             _mapper = new Mapper(config);
         }
@@ -77,11 +81,20 @@ namespace Marketplace.Api.Controllers
 
         [HttpPost("/[controller]/")]
         public async Task<IActionResult> CreateProduct(
-            CatalogProductApiPost model)
+            [FromForm] CatalogProductApiPost model)
         {
-            _logger.LogInformation(nameof(CreateProduct));
+            //_logger.LogWarning($"{nameof(CreateProduct)} {model.ExternalProductId} {model.Properties.Length}");
 
             var result = await _productRepository.CreateProductAsync(model: model);
+
+            if (result.IsSuccessed && !string.IsNullOrEmpty(result.Value))
+            {
+                Console.WriteLine("send productRegistry sync");
+
+                _producer.UpdateProductRegistryInfo(
+                    productId: model.ExternalProductId,
+                    result.Value);
+            }
 
             return Ok(result);
         }
