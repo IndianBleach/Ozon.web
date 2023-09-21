@@ -4,7 +4,7 @@ using Common.DTOs.Catalog;
 using Common.Repositories;
 using Marketplace.Data.Context;
 using Marketplace.Data.Entities.ProductsEntities;
-using Marketplace.Data.Enums;
+using Marketplace.Data.Entities.Storages;
 using Marketplace.Infrastructure.Requests;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -38,6 +38,8 @@ namespace Marketplace.Infrastructure.Repositories.Products
             // validate all values
             // check externalProductId
 
+            _logger.LogWarning("[count product props] " + model.Properties.Length);
+
             using var transaction = _dbContext.Database.BeginTransaction();
 
             try
@@ -52,7 +54,11 @@ namespace Marketplace.Infrastructure.Repositories.Products
                 var product = new CatalogProduct(
                     externalBaseProductId: model.ExternalProductId,
                     categorySectionId: model.SectionId,
-                    catalogStatus: ProductCatalogStatuses.STORAGE_RECEIVE_WAITING,
+                    marketplaceSellerId: null,
+                    title: model.Title,
+                    price: null,
+                    description: null,
+                    catalogStatus: ProductCatalogStatuses.ON_REGISTRATION,
                     dateAdded: DateTime.Now);
 
                 await _dbContext.CatalogProducts.AddAsync(product);
@@ -74,7 +80,7 @@ namespace Marketplace.Infrastructure.Repositories.Products
             }
             catch (Exception ex)
             {
-                _logger.LogWarning(ex.Message, nameof(CreateProductAsync));
+                _logger.LogWarning(ex.Message);
 
                 return QueryResult<string>.Failure(ex.Message);
             }
@@ -83,6 +89,12 @@ namespace Marketplace.Infrastructure.Repositories.Products
         public async Task<QueryResult<CatalogProductRead>> GetProductDetailAsync(string id)
         {
             CatalogProduct? findProduct = await _dbContext.CatalogProducts
+                .Include(x => x.CategorySection)
+                .ThenInclude(x => x.Category)
+                .ThenInclude(x => x.Catalog)
+                .Include(x => x.AvailableInStorages)
+                .ThenInclude(x => x.InStorage)
+                .ThenInclude(x => x.StorageAddr)
                 .FirstOrDefaultAsync(x => x.Id.Equals(id));
 
             if (findProduct == null)
@@ -113,9 +125,18 @@ namespace Marketplace.Infrastructure.Repositories.Products
                     .ToArray();
             }
 
+            ProductCatalogStorageInfo[] stores = findProduct.AvailableInStorages
+                .Select(x => new ProductCatalogStorageInfo(
+                    x.InStorageId,
+                    $"{x.InStorage?.StorageAddr?.City} {x.InStorage?.StorageAddr?.Street} {x.InStorage?.StorageAddr?.BuildingNumber}",
+                    stockStatusName: x.StockStatus == ProductStorageStockStatuses.IN_STOCK ? "В наличии" : "Нет в наличии",
+                    countNow: x.CountNow))
+                .ToArray();
+            
             CatalogProductRead dto = new CatalogProductRead
             {
                 Id = findProduct.Id,
+                SummaryStorages = stores,
                 Catalog = new CatalogRead
                 {
                     Id = findProduct.CategorySection?.Category?.Catalog?.Id ?? string.Empty,
@@ -126,9 +147,9 @@ namespace Marketplace.Infrastructure.Repositories.Products
                     Id = findProduct.CategorySection?.Category?.Id ?? string.Empty,
                     Name = findProduct.CategorySection?.Category?.Name ?? string.Empty
                 },
-                Description = $"Добавлен в каталог {findProduct.DateAdded}",
-                Name = $"ID {findProduct.Id}",
-                Price = "0",
+                Description = findProduct.Description ?? string.Empty,
+                Name = findProduct.Title ?? string.Empty,
+                Price = $"{findProduct.Price} Руб." ?? string.Empty,
                 Section = new CatalogSectionRead
                 {
                     Id = findProduct.CategorySectionId,

@@ -11,7 +11,7 @@ namespace Marketplace.Infrastructure.Specifications.Sections
 {
     public class AllSectionsIncludeCategorySpec : BaseSpecification<CategorySection>
     {
-        public AllSectionsIncludeCategorySpec() : base(x => x.Category != null)
+        public AllSectionsIncludeCategorySpec() : base(x => x.CategoryId != null)
         {
             base.AddInclude(x => x.Category);
         }

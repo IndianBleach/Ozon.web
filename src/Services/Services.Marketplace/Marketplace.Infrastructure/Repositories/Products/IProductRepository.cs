@@ -13,6 +13,8 @@ namespace Marketplace.Infrastructure.Repositories.Products
 {
     public interface IProductRepository
     {
+        //Task<QueryResult> UpdateStockStatus();
+
         Task<QueryResult<CatalogProductRead>> GetProductDetailAsync(string id);
 
         Task<QueryResult<string>> CreateProductAsync(CatalogProductApiPost model);

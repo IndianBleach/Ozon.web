@@ -3,6 +3,7 @@ using Common.Repositories;
 using Common.Specifications;
 using Marketplace.Data.Context;
 using Marketplace.Data.Entities;
+using Microsoft.EntityFrameworkCore.Storage;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,6 +19,13 @@ namespace Marketplace.Infrastructure.Repositories
         public ServiceRepository(ApplicationContext dbContext)
         {
             _dbContext = dbContext;
+        }
+
+        public int AddRange(T[] entities)
+        {
+            _dbContext.Set<T>().AddRange(entities);
+
+            return 0;
         }
 
         public bool Any(Func<T, bool> predicate)
@@ -55,6 +63,11 @@ namespace Marketplace.Infrastructure.Repositories
         public IEnumerable<T> GetAll()
         {
             return _dbContext.Set<T>();
+        }
+
+        public IDbContextTransaction NewTransaction()
+        {
+            return _dbContext.Database.BeginTransaction();
         }
     }
 }
