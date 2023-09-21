@@ -37,5 +37,7 @@ namespace Common.DTOs.Catalog
         public string Price { get; set; }
 
         public CatalogProductVariantRead[] Variants { get; set; }
+
+        public ProductCatalogStorageInfo[] SummaryStorages { get; set; }
     }
 }

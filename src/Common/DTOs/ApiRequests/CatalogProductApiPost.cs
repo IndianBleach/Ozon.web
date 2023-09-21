@@ -15,6 +15,8 @@ namespace Common.DTOs.ApiRequests
 
     public class CatalogProductApiPost
     {
+        public string? Title { get; set; }
+
         public string? ExternalProductId { get; set; }
 
         public string? SectionId { get; set; }
