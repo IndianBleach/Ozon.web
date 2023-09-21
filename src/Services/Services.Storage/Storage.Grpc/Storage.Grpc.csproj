@@ -11,21 +11,17 @@
 	<EnableUnsafeBinaryFormatterSerialization>true</EnableUnsafeBinaryFormatterSerialization>
   </PropertyGroup>
 
-	
-  <ItemGroup>
-    <None Remove="Protos\storages.proto" />
-    <None Remove="Protos\storageService.proto" />
-  </ItemGroup>
-
   <ItemGroup>
     <PackageReference Include="ClickHouse.Client" Version="6.7.4" />
     <PackageReference Include="Confluent.Kafka" Version="2.2.0" />
     <PackageReference Include="Google.Protobuf" Version="3.24.1" />
+    <PackageReference Include="Grpc" Version="2.46.6" />
     <PackageReference Include="Grpc.AspNetCore" Version="2.40.0" />
-    <PackageReference Include="Grpc.AspNetCore.Server.Reflection" Version="2.55.0" />
-    <PackageReference Include="Grpc.Net.Client" Version="2.55.0" />
-    <PackageReference Include="Grpc.Reflection" Version="2.55.0" />
-    <PackageReference Include="Grpc.Tools" Version="2.57.0">
+    <PackageReference Include="Grpc.AspNetCore.Server.Reflection" Version="2.57.0" />
+    <PackageReference Include="Grpc.Core" Version="2.46.6" />
+    <PackageReference Include="Grpc.Net.Client" Version="2.57.0" />
+    <PackageReference Include="Grpc.Reflection" Version="2.57.0" />
+    <PackageReference Include="Grpc.Tools" Version="2.58.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
@@ -33,19 +29,22 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="7.0.10" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.15.1" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="System.Reactive" Version="6.0.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\Common\Common.csproj" />
+    <ProjectReference Include="..\..\..\Ozon.Bus\Ozon.Bus.csproj" />
     <ProjectReference Include="..\Storage.Data\Storage.Data.csproj" />
     <ProjectReference Include="..\Storage.Infrastructure\Storage.Infrastructure.csproj" />
   </ItemGroup>
 
 	<ItemGroup>
 		<Protobuf Include="..\..\..\Common\Grpc\queries.proto" GrpcServices="None" ProtoCompile="False" Link="Common\Grpc\quries.proto" />
-		<Protobuf GrpcServices="Server" Include="Protos\storageService.proto" AdditionalImportDirs="..\..\..\Common\Grpc" />
-		<Protobuf Include="Protos\storages.proto" GrpcServices="Server">
+		<Protobuf Include="Protos\storages.proto">
 		  <AdditionalImportDirs>..\..\..\Common\Grpc</AdditionalImportDirs>
+		</Protobuf>
+		<Protobuf Include="Protos\storageService.proto" GrpcServices="Server" AdditionalImportDirs="..\..\..\Common\Grpc">
 		</Protobuf>
 	</ItemGroup>
 	
