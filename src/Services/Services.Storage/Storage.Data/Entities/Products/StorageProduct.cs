@@ -9,7 +9,7 @@ namespace Storage.Data.Entities.Products
 {
     public class StorageProduct : TEntity
     {
-        public string ExternalProductId { get; set; }
+        public string MarketplaceProductId { get; set; }
 
         public DateTime DateAdded { get; set; }
 
@@ -18,12 +18,12 @@ namespace Storage.Data.Entities.Products
         public MarketStorage? Storage { get; set; }
 
         public StorageProduct(
-            string externalProductId,
+            string marketplaceProductId,
             DateTime dateAdded,
             int storageId)
         {
             StorageId = storageId;
-            ExternalProductId = externalProductId;
+            MarketplaceProductId = marketplaceProductId;
             DateAdded = dateAdded;
         }
     }

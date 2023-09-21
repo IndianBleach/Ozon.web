@@ -30,7 +30,7 @@ namespace Storage.Data.Context
         public ApplicationContext(DbContextOptions<ApplicationContext> opt)
             : base(opt)
         {
-            //Database.EnsureCreated();
+            Database.EnsureCreated();
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
