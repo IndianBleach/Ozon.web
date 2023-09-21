@@ -4,29 +4,34 @@ using Common.DTOs.ApiRequests.Products;
 using Common.DTOs.Products;
 using Common.Repositories;
 using Microsoft.AspNetCore.Mvc;
+using Products.Api.Kafka.Producers;
 using Products.Data.Entities;
 using Products.Infrastructure.Mappers;
 
 namespace Products.Api.Controllers
 {
-    [ApiController]
+    //[ApiController]
     [Route("[controller]")]
-    [Produces("application/json")]
-    public class HomeController : ControllerBase
+    //[Produces("application/json")]
+    public class ProductsController : ControllerBase
     {
         private readonly IServiceRepository<Product> _productsRepository;
 
         private readonly IServiceRepository<ProductSeller> _sellersRepository;
 
-        private readonly ILogger<HomeController> _logger;
+        private readonly ILogger<ProductsController> _logger;
 
         private readonly IMapper _mapper;
 
-        public HomeController(
+        private readonly IMarketplaceProducer _marketplaceProducer;
+
+        public ProductsController(
+            IMarketplaceProducer marketplaceProducer,
             IServiceRepository<Product> productsRepository,
             IServiceRepository<ProductSeller> sellersRepository,
-            ILogger<HomeController> logger)
+            ILogger<ProductsController> logger)
         {
+            _marketplaceProducer = marketplaceProducer;
             _sellersRepository = sellersRepository;
             _productsRepository = productsRepository;
             _logger = logger;
@@ -43,9 +48,9 @@ namespace Products.Api.Controllers
 
         [HttpPost("/")]
         public async Task<IActionResult> RegisterProduct(
-            ProductApiPost model)
+            [FromForm]ProductApiPost model)
         {
-            _logger.LogInformation(nameof(RegisterProduct));
+            _logger.LogWarning($"{nameof(RegisterProduct)} {model.Title} {model.SellerId}");
 
             Product product = new Product(
                 title: model.Title,
@@ -62,9 +67,9 @@ namespace Products.Api.Controllers
 
         [HttpPost("/sellers")]
         public async Task<IActionResult> CreateSeller(
-            ProductSellerApiPost seller)
+            [FromForm]ProductSellerApiPost seller)
         {
-            _logger.LogInformation(nameof(CreateSeller));
+            _logger.LogWarning($"{nameof(CreateSeller)} {seller.Title} {seller.SpecialCode}");
 
             var result = _sellersRepository.Create(new ProductSeller(
                 name: seller.Title,
@@ -75,10 +80,27 @@ namespace Products.Api.Controllers
                 description: seller.Description,
                 dateCreated: DateTime.Now));
 
+            if (result.IsSuccessed)
+            {
+                _marketplaceProducer.AddMarketplaceSeller(
+                    seller,
+                    result.Value.Id);
+            }
+
             return Ok(QueryResult<string>.Successed(result.Value?.Id));
         }
 
-        [HttpGet("/all")]
+        [HttpGet("/sellers")]
+        public async Task<IActionResult> GetAllSellers()
+        {
+            _logger.LogInformation(nameof(GetAllSellers));
+
+            var result = _sellersRepository.GetAll();
+
+            return Ok(result);
+        }
+
+        [HttpGet("/")]
         public async Task<IActionResult> GetAllProducts()
         {
             _logger.LogInformation(nameof(GetAllProducts));
