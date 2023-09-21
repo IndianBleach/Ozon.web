@@ -1,16 +1,15 @@
-version: v1
+version: "3.8"
 services:
 
-
 #click-house
-  click-house:
-    container_name: click-house
-    image: yandex/clickhouse-server
-    ports:
-      - "2183:2183"
-      - "8123:8123"
-    networks:
-      - ozon-net
+  # click-house:
+  #   container_name: click-house
+  #   image: yandex/clickhouse-server
+  #   ports:
+  #     - "2183:2183"
+  #     - "8123:8123"
+  #   networks:
+  #     - ozon-net
 
 
 # #kafka
@@ -46,8 +45,8 @@ services:
       - ozon-net
 
 #services.products
-  serv-products-mssql:
-    container_name: serv-products-mssql
+  products-mssql:
+    container_name: products-mssql
     image: mcr.microsoft.com/mssql/server
     ports:
       - "1433"
@@ -60,22 +59,23 @@ services:
     networks:
      - ozon-net
 
-  serv-products-grpc:
-    container_name: serv-products-grpc
+  products-api:
+    container_name: products-api
     build: 
       context: .
-      dockerfile: ./Services/Services.Products/Products.Grpc/Dockerfile
+      dockerfile: ./Services/Services.Products/Products.Api/Dockerfile
     ports:
-      - "5015:5015"
+     - "5016:80"
+     - "5015:443"
     networks:
      - ozon-net
     depends_on:
-      - serv-products-mssql
+      - products-mssql
       - kafka-broker
 
 #services.storages
-  serv-storage-mssql:
-    container_name: serv-storage-mssql
+  storage-mssql:
+    container_name: storage-mssql
     image: mcr.microsoft.com/mssql/server
     ports:
       - "1433"
@@ -88,98 +88,125 @@ services:
     networks:
      - ozon-net
 
-  serv-storage-grpc:
-    container_name: serv-storage-grpc
+  storage-api:
+    container_name: storage-api
+    build: 
+      context: .
+      dockerfile: ./Services/Services.Storage/Storage.Api/Dockerfile
+    ports:
+     - "5011:80"
+     - "5012:443"
+    networks:
+     - ozon-net
+    depends_on:
+      - storage-mssql
+      - kafka-broker
+
+  storage-grpc:
+    container_name: storage-grpc
     build: 
       context: .
       dockerfile: ./Services/Services.Storage/Storage.Grpc/Dockerfile
     ports:
-      - "5010:5010"
+      - "5009:80"
+      - "5010:443"
     networks:
      - ozon-net
     depends_on:
-      - serv-storage-mssql
+      - storage-mssql
       - kafka-broker
-      - click-house 
+      # - click-house 
 
 #services.accounts
-  serv-accounts-mssql:
-   container_name: serv-accounts-mssql
+  # accounts-mssql:
+  #  container_name: accounts-mssql
+  #  image: mcr.microsoft.com/mssql/server
+  #  volumes:
+  #     - .volumes/services.accounts/data:/var/opt/mssql/data
+  #     - .volumes/services.accounts/logs:/var/opt/mssql/logs
+  #  ports:
+  #    - "7070:1433"
+  #  environment:
+  #    - MSSQL_SA_PASSWORD=Sample123!
+  #    - ACCEPT_EULA=Y
+  #  networks:
+  #    - ozon-net
+
+  # accounts-api:
+  #  container_name: accounts-api
+  #  build: 
+  #    context: .
+  #    dockerfile: ./Services/Services.Accounts/Accounts.RestApi/Dockerfile
+  #  ports:
+  #    - "5005:5005"
+  #  networks:
+  #    - ozon-net
+  #  depends_on:
+  #    - accounts-mssql
+
+  #services.accounts
+  marketplace-mssql:
+   container_name: marketplace-mssql
    image: mcr.microsoft.com/mssql/server
    volumes:
-      - .volumes/services.accounts/data:/var/opt/mssql/data
-      - .volumes/services.accounts/logs:/var/opt/mssql/logs
+      - .volumes/services.marketplace/data:/var/opt/mssql/data
+      - .volumes/services.marketplace/logs:/var/opt/mssql/logs
    ports:
-     - "7070:1433"
+     - "7073:1433"
    environment:
      - MSSQL_SA_PASSWORD=Sample123!
      - ACCEPT_EULA=Y
    networks:
      - ozon-net
 
-  serv-accounts-grpc:
-   container_name: serv-accounts-grpc
+  marketplace-api:
+   container_name: marketplace-api
    build: 
      context: .
-     dockerfile: ./Services/Services.Accounts/Accounts.Grpc/Dockerfile
+     dockerfile: ./Services/Services.Marketplace/Marketplace.Api/Dockerfile
    ports:
-     - "5005:5005"
+     - "5021:80"
+     - "5020:443"
    networks:
      - ozon-net
    depends_on:
-     - serv-accounts-mssql
+     - marketplace-mssql
 
-#services.auth
-  serv-auth-redis:
-   container_name: serv-auth-redis
-   image: redis
-   networks:
-     - ozon-net
-   ports:
-     - "9443:9443"
-     - "6379:6379"
+#services.authorize
+  # authorize-redis:
+  #  container_name: authorize-redis
+  #  image: redis
+  #  networks:
+  #    - ozon-net
+  #  ports:
+  #    - "9443:9443"
+  #    - "6379:6379"
 
-  serv-auth-grpc:
-   container_name: serv-auth-grpc
-   build: 
-     context: .
-     dockerfile: ./Services/Services.Authorization/Dockerfile
-   networks:
-     - ozon-net
-   depends_on:
-     - serv-auth-redis
-   ports:
-     - "5000:5000"
-
-#client
-  seed-client:
-    container_name: seed-client
-    build: 
-       context: .
-       dockerfile: ./Ozon.SeedClient/Dockerfile
-    networks:
-      - ozon-net
-    ports:
-      - "9011:80"
-      - "9012:443"
-    depends_on:
-      - ozon-api
-      - click-house
-      - kafka-broker
-
+  # authorize-api:
+  #  container_name: authorize-api
+  #  build: 
+  #    context: .
+  #    dockerfile: ./Services/Services.Authorization/Authorization.RestApi/Dockerfile
+  #  networks:
+  #    - ozon-net
+  #  depends_on:
+  #    - authorize-redis
+  #  ports:
+  #    - "5001:80"
+  #    - "5000:443"
 
 #api
   ozon-api:
-   container_name: ozon-api
-   build: 
-     context: .
-     dockerfile: ./Ozon.Api/Dockerfile
-   networks:
-     - ozon-net
-   ports:
-     - "9095:80"
-     - "9096:443"
+    container_name: ozon-api
+    build: 
+      context: .
+      dockerfile: ./Ozon.Api/Dockerfile
+    networks:
+      - ozon-net
+    ports:
+      - "9095:80"
+      - "9096:443"
 
 networks:
- ozon-net:
-   driver: bridge
+  ozon-net:
+    driver: bridge
