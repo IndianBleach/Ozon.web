@@ -1,6 +1,7 @@
 ﻿using Common.DataQueries;
 using Common.Repositories;
 using Common.Specifications;
+using Microsoft.EntityFrameworkCore.Storage;
 using Products.Data.Context;
 using Products.Data.Entities;
 using System;
@@ -18,6 +19,13 @@ namespace Products.Infrastructure.Repositories
         public ServiceRepository(ApplicationContext dbContext)
         {
             _dbContext = dbContext;
+        }
+
+        public int AddRange(T[] entities)
+        {
+            _dbContext.Set<T>().AddRange(entities);
+
+            return 0;
         }
 
         public bool Any(Func<T, bool> predicate)
@@ -55,6 +63,11 @@ namespace Products.Infrastructure.Repositories
         public IEnumerable<T> GetAll()
         {
             return _dbContext.Set<T>();
+        }
+
+        public IDbContextTransaction NewTransaction()
+        {
+            return _dbContext.Database.BeginTransaction();
         }
     }
 }

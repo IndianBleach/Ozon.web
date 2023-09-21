@@ -21,12 +21,6 @@ namespace Ozon.Api.Controllers
             IConfiguration config)
         {
             _logger = logger;
-            string s1 = config["Services:Authorization:GrpcConnectionString"];
-
-            _authChannel = GrpcChannel.ForAddress(s1);
-
-            string s2 = config["Services:Accounts:GrpcConnectionString"];
-            _accountChannel = GrpcChannel.ForAddress(s2);
         }
 
         [HttpPost("role")]

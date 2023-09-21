@@ -6,6 +6,13 @@ using System.Threading.Tasks;
 
 namespace Common.Config
 {
+    public class JWTAccountsConfigOptions
+    {
+        public const string ISSUER = "service.accounts.jwt.issuer";
+        public const string AUDINCE = "service.accounts.jwt.audince";
+        public const string SECRET_KEY = "jwq0-0d-0-zxm9d0!89218]=-qdan8u1082d-==quijdh-01002-ddkdqqqqqqqqq";
+    }
+
     public class JWTConfigOptions
     {
         public const string ISSUER = "ozon.jwt.issuer";

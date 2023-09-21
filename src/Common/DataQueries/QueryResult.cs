@@ -50,6 +50,14 @@ namespace Common.DataQueries
         }
     }
 
+    public class QueryResultResponseRead<T>
+    {
+        public T? Value { get;  set; }
+
+        public string? StatusMessage { get;  set; }
+
+        public bool IsSuccessed { get;  set; }
+    }
 
     public class QueryResult<T>
     {

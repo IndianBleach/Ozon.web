@@ -11,6 +11,37 @@ builder.Services.AddCors();
 builder.Services.AddControllers();
 
 
+// REVERSE PROXY
+builder.Services.AddReverseProxy()
+    .LoadFromConfig(builder.Configuration.GetSection("ReverseProxy"));
+
+builder.Services.AddHttpClient("Accounts", client =>
+{
+    client.BaseAddress = new Uri("http://ozon-api/accounts/");
+});
+
+builder.Services.AddHttpClient("Storages", client =>
+{
+    client.BaseAddress = new Uri("http://ozon-api/storages/");
+});
+
+builder.Services.AddHttpClient("Authorize", client =>
+{
+    client.BaseAddress = new Uri("http://ozon-api/authorize/");
+});
+
+builder.Services.AddHttpClient("Products", client =>
+{
+    client.BaseAddress = new Uri("http://ozon-api/products/");
+});
+
+builder.Services.AddHttpClient("Catalogs", client =>
+{
+    client.BaseAddress = new Uri("http://ozon-api/catalogs/");
+});
+///////////
+
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -46,9 +77,16 @@ app.UseSwaggerUI();
 
 //app.UseHttpsRedirection();
 
+app.UseRouting();
+
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapReverseProxy();
+});
 
 app.Run();
