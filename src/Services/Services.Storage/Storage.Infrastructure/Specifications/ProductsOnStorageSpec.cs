@@ -13,6 +13,9 @@ namespace Storage.Infrastructure.Specifications
     {
         public ProductsOnStorageSpec(int onStorageId) 
             : base(x => x.StorageId.Equals(onStorageId))
-        {}
+        {
+            base.AddInclude(x => x.Storage);
+            base.AddInclude(x => x.Storage.Address);
+        }
     }
 }
