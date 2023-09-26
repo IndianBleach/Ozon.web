@@ -2,8 +2,8 @@ using Common.Repositories;
 using Hangfire;
 using Hangfire.MemoryStorage;
 using Microsoft.EntityFrameworkCore;
+using Storage.Api.Extensions;
 using Storage.Api.Kafka;
-using Storage.Api.Kafka.Producers;
 using Storage.Data.Context;
 using Storage.Data.Entities.Products;
 using Storage.Infrastructure.Repositories;
@@ -19,6 +19,9 @@ builder.Services.AddHangfire(configuration => configuration
         .UseRecommendedSerializerSettings()
         .UseMemoryStorage());
 
+builder.Services.AddConsumerFactory("kafka-broker:9092");
+builder.Services.AddProducerFactory("kafka-broker:9092");
+
 builder.Services.AddHangfireServer(options => {
     options.Queues = new[] { "consumers", "beta", "default" };
 });
@@ -32,8 +35,6 @@ builder.Services.AddScoped(typeof(IServiceRepository<>), typeof(ServiceRepositor
 
 builder.Services.AddSingleton(new KafkaOptions(
     host: "kafka-broker:9092"));
-
-builder.Services.AddScoped<IMarketplaceProducer, MarketplaceProducer>();
 
 
 builder.Services.Configure<HostOptions>(config =>

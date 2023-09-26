@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Storage.Data.Context;
 using Storage.Grpc.ClickHouse;
+using Storage.Grpc.Extensions;
 using Storage.Grpc.Services;
 using Storage.Infrastructure.Repositories;
 using System.Net;
@@ -29,6 +30,8 @@ Console.WriteLine("[After house]");
 builder.Services.AddGrpc();
 
 builder.Services.AddGrpcReflection();
+
+builder.Services.AddProducerFactory("kafka-broker:9092");
 
 
 var app = builder.Build();
