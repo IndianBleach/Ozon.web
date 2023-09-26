@@ -13,7 +13,7 @@ namespace Products.Api.Controllers
             _jobClient = jobClient;
         }
 
-        [HttpPost("/consumers/productRegistry")]
+        [HttpPost("/consumers/")]
         public async Task<IActionResult> Start_productRegistry()
         {
             var id = _jobClient.Enqueue<CS_SyncProductRegistryInfo>((service) => service.ConsumeAsync());

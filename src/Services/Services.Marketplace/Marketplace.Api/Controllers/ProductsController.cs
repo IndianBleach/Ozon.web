@@ -3,7 +3,6 @@ using Common.DTOs.ApiRequests;
 using Common.DTOs.Catalog;
 using Common.Repositories;
 using Confluent.Kafka;
-using Marketplace.Api.Kafka.Producers;
 using Marketplace.Data.Entities.ProductsEntities;
 using Marketplace.Data.Entities.PropertyEntities;
 using Marketplace.Infrastructure.Mappers;

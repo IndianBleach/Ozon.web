@@ -9,7 +9,6 @@ using Hangfire;
 using Microsoft.AspNetCore.Mvc;
 using Ozon.Bus;
 using Ozon.Bus.DTOs.StorageService;
-using Storage.Api.Kafka.Producers;
 using Storage.Api.Kafka.Services;
 using Storage.Data.Entities.Actions;
 using Storage.Data.Entities.Address;

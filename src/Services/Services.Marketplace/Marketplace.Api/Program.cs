@@ -4,7 +4,6 @@ using Hangfire;
 using Hangfire.MemoryStorage;
 using Marketplace.Api.Extensions;
 using Marketplace.Api.Kafka;
-using Marketplace.Api.Kafka.Producers;
 using Marketplace.Data.Context;
 using Marketplace.Infrastructure.BusServices;
 using Marketplace.Infrastructure.Repositories;
@@ -37,8 +36,6 @@ builder.Services.AddTransient<IProductRepository, ProductRepository>();
 builder.Services.AddTransient(typeof(IServiceRepository<>), typeof(ServiceRepository<>));
 
 builder.Services.AddTransient<IMarketplaceProductBusService, MarketplaceProductBusService>();
-
-builder.Services.AddTransient<IProductRegistryProducer, ProductRegistryProducer>();
 
 string kafkaHost = "kafka-broker:9092";
 builder.Services.AddConsumerFactory(kafkaHost);
