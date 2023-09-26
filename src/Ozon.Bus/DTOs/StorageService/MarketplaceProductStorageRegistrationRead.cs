@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Ozon.Bus.DTOs.StorageService
 {
-    public class MarketplaceProductStorageRegistrationRead
+    public class MarketplaceProductStorageRegistrationRead : TMessageBusValue
     {
         public string? MarketplaceProductId { get; set; }
 

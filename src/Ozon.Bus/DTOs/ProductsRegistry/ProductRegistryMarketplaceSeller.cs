@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Ozon.Bus.DTOs.ProductsRegistry
 {
-    public class ProductRegistryMarketplaceSeller
+    public class ProductRegistryMarketplaceSeller : TMessageBusValue
     {
         public string? ExternalSellerId { get; set; }
 

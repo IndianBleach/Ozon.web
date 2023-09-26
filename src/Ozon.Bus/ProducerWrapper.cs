@@ -8,22 +8,13 @@ using System.Threading.Tasks;
 
 namespace Ozon.Bus
 {
-    public class Producer<TKey, TMessage> where TMessage : class
+    public class ProducerWrapper<TKey, TMessage> where TMessage : class
     {
-        private ProducerConfig _producerConfig;
+        private IProducer<TKey, TMessage> _producer;
 
-        private ProducerBuilder<TKey, TMessage> _builder;
-
-        public Producer(ProducerConfig config)
+        public ProducerWrapper(IProducer<TKey, TMessage> producer)
         {
-            _producerConfig = config;
-
-            _builder = new ProducerBuilder<TKey, TMessage>(
-                _producerConfig.AsEnumerable())
-                .SetValueSerializer(new ServiceBusValueSerializer<TMessage>())
-                .SetErrorHandler((_, error) => {
-                    Console.WriteLine("PRODUCER ERROR: " + error.Reason);
-                });
+            _producer = producer;
         }
 
         public void PublishMessage(
@@ -32,16 +23,13 @@ namespace Ozon.Bus
         {
             try
             {
-                using var producer = _builder
-                .Build();
-
-                producer.Produce(
+                _producer.Produce(
                     topic: toTopicAddr,
                     message: message);
 
                 Console.WriteLine("DELIVERY RESULT: " + message.Key);
 
-                producer.Flush();
+                _producer.Flush();
             }
             catch (Exception exp)
             {
@@ -56,15 +44,12 @@ namespace Ozon.Bus
         {
             try
             {
-                using var producer = _builder
-                .Build();
-
-                producer.Produce(
+                _producer.Produce(
                     topic: toTopicAddr,
                     message: message,
                     deliveryHandler: handler);
 
-                producer.Flush();
+                _producer.Flush();
             }
             catch (Exception exp)
             {

@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Ozon.Bus.Serdes
 {
-    public class ServiceBusValueDeserializer<T> : IDeserializer<T> where T : class
+    public class ServiceBusValueDeserializer<T> : IDeserializer<T>
     {
         public T Deserialize(ReadOnlySpan<byte> data, bool isNull, SerializationContext context)
         {
@@ -18,7 +18,7 @@ namespace Ozon.Bus.Serdes
         }
     }
 
-    public class ServiceBusValueSerializer<T> : ISerializer<T> where T : class 
+    public class ServiceBusValueSerializer<T> : ISerializer<T> 
     {
         public byte[] Serialize(T data, SerializationContext context)
         {
