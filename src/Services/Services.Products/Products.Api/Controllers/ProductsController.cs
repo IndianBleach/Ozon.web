@@ -3,8 +3,10 @@ using Common.DataQueries;
 using Common.DTOs.ApiRequests.Products;
 using Common.DTOs.Products;
 using Common.Repositories;
+using Confluent.Kafka;
 using Microsoft.AspNetCore.Mvc;
-using Products.Api.Kafka.Producers;
+using Ozon.Bus;
+using Ozon.Bus.DTOs.ProductsRegistry;
 using Products.Data.Entities;
 using Products.Infrastructure.Mappers;
 
@@ -23,15 +25,15 @@ namespace Products.Api.Controllers
 
         private readonly IMapper _mapper;
 
-        private readonly IMarketplaceProducer _marketplaceProducer;
+        private readonly IProducerFactory _producerFactory;
 
         public ProductsController(
-            IMarketplaceProducer marketplaceProducer,
+            IProducerFactory producerFactory,
             IServiceRepository<Product> productsRepository,
             IServiceRepository<ProductSeller> sellersRepository,
             ILogger<ProductsController> logger)
         {
-            _marketplaceProducer = marketplaceProducer;
+            _producerFactory = producerFactory;
             _sellersRepository = sellersRepository;
             _productsRepository = productsRepository;
             _logger = logger;
@@ -69,7 +71,7 @@ namespace Products.Api.Controllers
         public async Task<IActionResult> CreateSeller(
             [FromForm]ProductSellerApiPost seller)
         {
-            _logger.LogWarning($"{nameof(CreateSeller)} {seller.Title} {seller.SpecialCode}");
+            _logger.LogInformation($"{nameof(CreateSeller)} {seller.Title} {seller.SpecialCode}");
 
             var result = _sellersRepository.Create(new ProductSeller(
                 name: seller.Title,
@@ -82,9 +84,30 @@ namespace Products.Api.Controllers
 
             if (result.IsSuccessed)
             {
-                _marketplaceProducer.AddMarketplaceSeller(
-                    seller,
-                    result.Value.Id);
+                ProducerWrapper<string, ProductRegistryMarketplaceSeller>? producer = _producerFactory.Get<string, ProductRegistryMarketplaceSeller>();
+
+                if (producer != null)
+                {
+                    producer.PublishMessage(
+                        toTopicAddr: "products-marketplace.addMarketplaceSeller",
+                        message: new Message<string, ProductRegistryMarketplaceSeller>
+                        {
+                            Key = Guid.NewGuid().ToString(),
+                            Value = new ProductRegistryMarketplaceSeller
+                            {
+                                Description = seller.Description,
+                                Email = seller.Email,
+                                ExternalSellerId = result.Value.Id,
+                                Name = seller.Title,
+                                Site = seller.Site
+                            }
+                        },
+                        handler: (report) =>
+                        {
+                            _logger.LogInformation($"msg[products-marketplace.addMarketplaceSeller] report: {report.Error.Reason} {report.Status.ToString()}");
+                        });
+                }
+                else _logger.LogCritical("producer not found [ProductRegistryMarketplaceSeller]");
             }
 
             return Ok(QueryResult<string>.Successed(result.Value?.Id));

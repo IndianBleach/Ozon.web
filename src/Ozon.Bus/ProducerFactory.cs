@@ -16,6 +16,26 @@ namespace Ozon.Bus
         private string _getProducerName<TKey, TMessage>()
             => $"{typeof(TKey)}.{typeof(TMessage)}";
 
+        public ProducerWrapper<TKey, List<TMessage>>? GetBatch<TKey, TMessage>() where TMessage : TMessageBusValue
+        {
+            ProducerConfig? findConfig;
+            _producers.TryGetValue(
+                key: _getProducerName<TKey, TMessage>(),
+                out findConfig);
+
+            if (findConfig == null)
+                return null;
+
+            var builder = new ProducerBuilder<TKey, List<TMessage>>(
+                findConfig.AsEnumerable())
+                .SetValueSerializer(new ServiceBusValueSerializer<List<TMessage>>())
+                .SetErrorHandler((_, error) => {
+                    Console.WriteLine("PRODUCER ERROR: " + error.Reason);
+                });
+
+            return new ProducerWrapper<TKey, List<TMessage>>(builder.Build());
+        }
+
         public ProducerWrapper<TKey, TMessage>? Get<TKey, TMessage>() where TMessage : TMessageBusValue
         {
             ProducerConfig? findConfig;
