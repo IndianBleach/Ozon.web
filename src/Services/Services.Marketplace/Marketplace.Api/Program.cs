@@ -1,12 +1,18 @@
 using Common.Repositories;
+using Confluent.Kafka;
 using Hangfire;
 using Hangfire.MemoryStorage;
+using Marketplace.Api.Extensions;
+using Marketplace.Api.Kafka;
 using Marketplace.Api.Kafka.Producers;
 using Marketplace.Data.Context;
 using Marketplace.Infrastructure.BusServices;
 using Marketplace.Infrastructure.Repositories;
 using Marketplace.Infrastructure.Repositories.Products;
 using Microsoft.EntityFrameworkCore;
+using Ozon.Bus;
+using Ozon.Bus.DTOs.ProductsRegistry;
+using Ozon.Bus.DTOs.StorageService;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -34,8 +40,11 @@ builder.Services.AddTransient<IMarketplaceProductBusService, MarketplaceProductB
 
 builder.Services.AddTransient<IProductRegistryProducer, ProductRegistryProducer>();
 
+string kafkaHost = "kafka-broker:9092";
+builder.Services.AddConsumerFactory(kafkaHost);
+builder.Services.AddProducerFactory(kafkaHost);
+
 // elastic, redis
-//builder.Services.AddGrpc();
 
 builder.Services.AddControllers();
 

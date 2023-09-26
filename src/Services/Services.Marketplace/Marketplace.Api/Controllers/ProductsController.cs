@@ -2,6 +2,7 @@
 using Common.DTOs.ApiRequests;
 using Common.DTOs.Catalog;
 using Common.Repositories;
+using Confluent.Kafka;
 using Marketplace.Api.Kafka.Producers;
 using Marketplace.Data.Entities.ProductsEntities;
 using Marketplace.Data.Entities.PropertyEntities;
@@ -9,6 +10,8 @@ using Marketplace.Infrastructure.Mappers;
 using Marketplace.Infrastructure.Repositories.Products;
 using Marketplace.Infrastructure.Specifications.Properties;
 using Microsoft.AspNetCore.Mvc;
+using Ozon.Bus;
+using Ozon.Bus.DTOs.StorageService;
 
 namespace Marketplace.Api.Controllers
 {
@@ -25,14 +28,16 @@ namespace Marketplace.Api.Controllers
 
         private readonly IMapper _mapper;
 
-        private IProductRegistryProducer _producer;
+        private IProducerFactory _producerFactory;
 
         public ProductsController(
-            IProductRegistryProducer producer,
+            IProducerFactory producerFactory,
             ILogger<ProductsController> logger,
             IServiceRepository<CatalogProduct> productsRepository,
             IProductRepository productRepository)
         {
+            _producerFactory = producerFactory;
+
             _productServiceRepository = productsRepository;
             _logger = logger;
             _productRepository = productRepository;
@@ -40,21 +45,12 @@ namespace Marketplace.Api.Controllers
             var config = new MapperConfiguration(cfg => cfg.AddProfiles(new List<Profile> {
                 new CatalogMapProfile()
             }));
-
-            _producer = producer;
-
             _mapper = new Mapper(config);
         }
-
 
         // validation
         // elastic
         // cache
-
-        // get detail product
-
-        // catalog/products/123
-        // catalog/products (проды с вариантами)
 
         [HttpGet("/[controller]/")]
         public async Task<IActionResult> GetAllProducts()
@@ -83,17 +79,32 @@ namespace Marketplace.Api.Controllers
         public async Task<IActionResult> CreateProduct(
             [FromForm] CatalogProductApiPost model)
         {
-            //_logger.LogWarning($"{nameof(CreateProduct)} {model.ExternalProductId} {model.Properties.Length}");
-
             var result = await _productRepository.CreateProductAsync(model: model);
 
             if (result.IsSuccessed && !string.IsNullOrEmpty(result.Value))
             {
                 Console.WriteLine("send productRegistry sync");
 
-                _producer.UpdateProductRegistryInfo(
-                    productId: model.ExternalProductId,
-                    result.Value);
+                ProducerWrapper<string, SyncProductRegistryInfoRequest>? producer = _producerFactory.Get<string, SyncProductRegistryInfoRequest>();
+                if (producer != null)
+                {
+                    _logger.LogInformation($"[syncProductRegistryInfo-req] +msg " + result.Value + " " + model.ExternalProductId);
+
+                    producer.PublishMessage(
+                        toTopicAddr: "marketplace-products.syncProductRegistryInfo-req",
+                        message: new Message<string, SyncProductRegistryInfoRequest>
+                        {
+                            Key = Guid.NewGuid().ToString(),
+                            Value = new SyncProductRegistryInfoRequest
+                            {
+                                ExternalProductId = model.ExternalProductId,
+                                MarketplaceProductId = result.Value,
+                                BusAsnwerChannel = "marketplace-products.syncProductRegistryInfo-answer"
+                            }
+                        }, (report) => {
+                            _logger.LogInformation($"[syncProductRegistryInfo-req] delivery {report.Status}");
+                        });
+                }
             }
 
             return Ok(result);

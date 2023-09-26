@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using Ozon.Bus.DTOs.StorageService;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -70,7 +71,7 @@ namespace Marketplace.Infrastructure.BusServices
             else _logger.LogCritical("product not found");
         }
 
-        public void UpdateProductsStorageInfo(List<StorageProductUpdateMarketplaceStockInfo> products)
+        public void UpdateProductsStorageInfo(ReadOnlyCollection<StorageProductUpdateMarketplaceStockInfo> products)
         {
             // закешить
             // при добавлении обновить кеш

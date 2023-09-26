@@ -8,13 +8,13 @@ namespace Marketplace.Api.Kafka.Producers
 {
     public class ProductRegistryProducer : IProductRegistryProducer
     {
-        private Producer<string, SyncProductRegistryInfoRequest> _productRegistryProducer;
+        private ProducerWrapper<string, SyncProductRegistryInfoRequest> _productRegistryProducer;
 
         private readonly ILogger<ProductRegistryProducer> _logger;
 
         public ProductRegistryProducer(ILogger<ProductRegistryProducer> logger)
         {
-            _productRegistryProducer = new Producer<string, SyncProductRegistryInfoRequest>(
+            _productRegistryProducer = new ProducerWrapper<string, SyncProductRegistryInfoRequest>(
                 config: new ProducerConfig()
                 {
                     BootstrapServers = "kafka-broker:9092",

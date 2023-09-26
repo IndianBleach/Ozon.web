@@ -8,6 +8,8 @@ using Ozon.Bus;
 using Common.Repositories;
 using Marketplace.Data.Entities.Sellers;
 using Ozon.Bus.DTOs.ProductsRegistry;
+using Ozon.Bus.Keys;
+using System.Reactive;
 
 namespace Marketplace.Api.Kafka
 {
@@ -21,10 +23,15 @@ namespace Marketplace.Api.Kafka
 
         private readonly IServiceRepository<MarketplaceSeller> _sellerRepository;
 
+        private readonly IConsumerFactory _consumerFactory;
+
         public CS_AddMarketplaceSeller(
+            IConsumerFactory consumerFactory,
             IServiceRepository<MarketplaceSeller> sellerRepository,
             ILogger<CS_AddMarketplaceSeller> logger)
         {
+            _consumerFactory = consumerFactory;
+
             _sellerRepository = sellerRepository;
 
             _logger = logger;
@@ -35,59 +42,50 @@ namespace Marketplace.Api.Kafka
         [Queue("consumers")]
         public async Task ConsumeAsync()
         {
-            _logger.LogCritical("[Start consuming]");
+            _logger.LogInformation("[Start consuming...] CS_AddMarketplaceSeller");
 
             CancellationTokenSource token = new CancellationTokenSource();
 
-            try
+            ConsumerWrapper<string, ProductRegistryMarketplaceSeller>? consumer = _consumerFactory.GetSingle<string, ProductRegistryMarketplaceSeller>();
+
+            if (consumer != null)
             {
-                Consumer<string, ProductRegistryMarketplaceSeller> consumer = new Consumer<string, ProductRegistryMarketplaceSeller>(
-                    config: new ConsumerConfig()
-                    {
-                        GroupId = nameof(CS_AddMarketplaceSeller),
-                        AutoOffsetReset = AutoOffsetReset.Earliest,
-                        BootstrapServers = _kafkaServer,
-                        EnableAutoCommit = false,
-                        AutoCommitIntervalMs = 0,
-                    },
-                    valueDeserializator: new ServiceBusValueDeserializer<ProductRegistryMarketplaceSeller>(),
-                    onExeption: (sender, exp) => {
-                        Console.WriteLine("[CANCEL TOKEN]");
-                        //consumer.close
-                        token.Cancel();
-                    });
+                try
+                {
+                    var data = consumer.ObservableData(new string[] { "products-marketplace.addMarketplaceSeller" });
 
-                var observer = consumer.ConsumeObserv(new List<string> { "products-marketplace.addMarketplaceSeller" });
-
-                // update marketplace product storages stock info
-                observer.Subscribe(
-                    message =>
-                    {
-                        _logger.LogInformation($"[{nameof(CS_AddMarketplaceSeller)}] msgs received: {message.Name} {message.ExternalSellerId}");
-
-                        if (!string.IsNullOrEmpty(message.ExternalSellerId))
+                    data.Subscribe(
+                        message =>
                         {
-                            _sellerRepository.Create(new MarketplaceSeller(
-                                externalSellerId: message.ExternalSellerId,
-                                title: message.Name,
-                                verified: false,
-                                isPopular: false,
-                                created: DateTime.Now,
-                                description: message.Description,
-                                site: message.Site,
-                                email: message.Email));
-                        }
-                        else
-                        {
-                            _logger.LogCritical($"msg delivery error, channel[products-marketplace.addMarketplaceSeller], null-exId");
-                        }
-                    });
+                            _logger.LogInformation($"[{nameof(CS_AddMarketplaceSeller)}] msgs received: {message.Name} {message.ExternalSellerId}");
 
-                consumer.Start(token.Token);
-            }
-            catch (Exception exp)
-            {
-                _logger.LogError("spec erorr: " + exp.Message);
+                            if (!string.IsNullOrEmpty(message.ExternalSellerId))
+                            {
+                                _sellerRepository.Create(new MarketplaceSeller(
+                                    externalSellerId: message.ExternalSellerId,
+                                    title: message.Name,
+                                    verified: false,
+                                    isPopular: false,
+                                    created: DateTime.Now,
+                                    description: message.Description,
+                                    site: message.Site,
+                                    email: message.Email));
+                            }
+                            else
+                            {
+                                _logger.LogCritical($"msg delivery error, channel[products-marketplace.addMarketplaceSeller], null-exId");
+                            }
+
+                            // testing
+                            consumer.Commit();
+                        });
+
+                    consumer.StartConsume(token.Token);
+                }
+                catch (Exception exp)
+                {
+                    _logger.LogError("spec erorr: " + exp.Message);
+                }
             }
         }
     }
