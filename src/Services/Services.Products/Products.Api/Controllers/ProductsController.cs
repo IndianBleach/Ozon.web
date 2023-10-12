@@ -48,6 +48,7 @@ namespace Products.Api.Controllers
         // /products/ -> /
         // /products/sellers -> /sellers/..
 
+
         [HttpPost("/")]
         public async Task<IActionResult> RegisterProduct(
             [FromForm]ProductApiPost model)

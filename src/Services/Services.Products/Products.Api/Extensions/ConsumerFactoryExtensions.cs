@@ -12,9 +12,9 @@ namespace Products.Api.Extensions
         {
             var factory = new ConsumerFactory();
 
-            factory.Register<string, SyncProductRegistryInfoAnswer>(new ConsumerConfig()
+            factory.Register<string, SyncProductRegistryInfoRequest>(new ConsumerConfig()
             {
-                GroupId = nameof(SyncProductRegistryInfoAnswer),
+                GroupId = nameof(SyncProductRegistryInfoRequest),
                 AutoOffsetReset = AutoOffsetReset.Latest,
                 BootstrapServers = kafkaHost,
                 EnableAutoCommit = false,

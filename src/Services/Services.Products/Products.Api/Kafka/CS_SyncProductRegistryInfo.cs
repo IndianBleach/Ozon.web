@@ -49,52 +49,61 @@ namespace Marketplace.Api.Kafka
 
             ConsumerWrapper<string, SyncProductRegistryInfoRequest>? consumer = _consumerFactory.GetSingle<string, SyncProductRegistryInfoRequest>();
 
-            if (consumer != null)
+            if (consumer == null)
             {
-                try
-                {
-                    var data = consumer.ObservableData(new List<string> { "marketplace-products.syncProductRegistryInfo-req" });
+                _logger.LogCritical("consumer not found: SyncProductRegistryInfoRequest");
+                return;
+            }
 
-                    // update marketplace product registry info
-                    data.Subscribe(
-                       message =>
+            if (answerProducer == null)
+            {
+                _logger.LogCritical("producer not found: SyncProductRegistryInfoAnswer");
+                return;
+            }
+
+            try
+            {
+                var data = consumer.ObservableData(new List<string> { "marketplace-products.syncProductRegistryInfo-req" });
+
+                // update marketplace product registry info
+                data.Subscribe(
+                   message =>
+                   {
+                       _logger.LogInformation($"[{nameof(CS_SyncProductRegistryInfo)}] msgs received:");
+
+                       Product? findProduct = _productRepository.FirstOrDefault(new GetProductByIdSpec(message.ExternalProductId ?? string.Empty));
+
+                       if (findProduct == null)
+                           _logger.LogCritical("[marketplace-products.syncProductRegistryInfo-req] product not found " + message.ExternalProductId);
+                       else
                        {
-                           _logger.LogInformation($"[{nameof(CS_SyncProductRegistryInfo)}] msgs received:");
-
-                           Product? findProduct = _productRepository.FirstOrDefault(new GetProductByIdSpec(message.ExternalProductId ?? string.Empty));
-
-                           if (findProduct == null)
-                               _logger.LogCritical("[marketplace-products.syncProductRegistryInfo-req] product not found " + message.ExternalProductId);
-                           else
+                           if (answerProducer != null)
                            {
-                               if (answerProducer != null)
-                               {
-                                   answerProducer.PublishMessage(
-                                      toTopicAddr: message.BusAsnwerChannel,
-                                      message: new Message<string, SyncProductRegistryInfoAnswer>
+                               answerProducer.PublishMessage(
+                                  toTopicAddr: message.BusAsnwerChannel,
+                                  message: new Message<string, SyncProductRegistryInfoAnswer>
+                                  {
+                                      Key = Guid.NewGuid().ToString(),
+                                      Value = new SyncProductRegistryInfoAnswer
                                       {
-                                          Key = Guid.NewGuid().ToString(),
-                                          Value = new SyncProductRegistryInfoAnswer
-                                          {
-                                              DefaultPrice = findProduct.DefaultPrice,
-                                              Description = findProduct.Description,
-                                              SellerId = findProduct.SellerId,
-                                              Title = findProduct.Title,
-                                              MarketplaceProductId = message.MarketplaceProductId
-                                          }
-                                      });
-                               }
-                               else _logger.LogCritical("producer not found [SyncProductRegistryInfoAnswer]");
+                                          DefaultPrice = findProduct.DefaultPrice,
+                                          Description = findProduct.Description,
+                                          SellerId = findProduct.SellerId,
+                                          Title = findProduct.Title,
+                                          MarketplaceProductId = message.MarketplaceProductId
+                                      }
+                                  });
                            }
+                           else _logger.LogCritical("producer not found [SyncProductRegistryInfoAnswer]");
+                       }
 
-                       });
+                   });
 
-                    consumer.StartConsume(token.Token);   
-                }
-                catch (Exception exp)
-                {
-                    _logger.LogError("spec erorr: " + exp.Message);
-                }
+                consumer.StartConsume(token.Token);
+            }
+            catch (Exception exp)
+            {
+                _logger.LogError("spec erorr: " + exp.Message);
             }
         }
     }
