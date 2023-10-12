@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "Ozon.Simulator": {
+      "commandName": "Project"
+    },
+    "Docker": {
+      "commandName": "Docker"
+    }
+  }
+}
