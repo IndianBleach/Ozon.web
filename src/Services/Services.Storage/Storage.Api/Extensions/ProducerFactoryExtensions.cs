@@ -18,6 +18,20 @@ namespace Storage.Api.Extensions
                 EnableBackgroundPoll = false,
             });
 
+            producerFactory.Register<string, SyncProductRegistryInfoAnswer>(new ProducerConfig()
+            {
+                BootstrapServers = kafkaHost,
+                Acks = Acks.Leader,
+                EnableBackgroundPoll = false
+            });
+
+            producerFactory.Register<string, AddStorageMessage>(new ProducerConfig()
+            {
+                BootstrapServers = kafkaHost,
+                Acks = Acks.Leader,
+                EnableBackgroundPoll = false,
+            });
+
             services.AddSingleton<IProducerFactory>(producerFactory);
         }
     }

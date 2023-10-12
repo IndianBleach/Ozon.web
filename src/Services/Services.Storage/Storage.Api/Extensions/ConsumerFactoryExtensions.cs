@@ -13,6 +13,30 @@ namespace Storage.Api.Extensions
         {
             var factory = new ConsumerFactory();
 
+            factory.Register<string, MarketplaceProductStorageRegistrationRead>(new ConsumerConfig()
+            {
+                GroupId = nameof(MarketplaceProductStorageRegistrationRead),
+                AutoOffsetReset = AutoOffsetReset.Latest,
+                BootstrapServers = kafkaHost,
+                EnableAutoCommit = false,
+                AutoCommitIntervalMs = 0,
+                Acks = Acks.Leader
+            });
+
+            factory.Register<string, SyncProductRegistryInfoRequest>(new ConsumerConfig()
+            {
+                GroupId = nameof(SyncProductRegistryInfoRequest),
+                AutoOffsetReset = AutoOffsetReset.Latest,
+                BootstrapServers = kafkaHost,
+                EnableAutoCommit = false,
+                AutoCommitIntervalMs = 0,
+                Acks = Acks.Leader
+            });
+
+            //SyncProductRegistryInfoAnswer
+
+            services.AddSingleton<IConsumerFactory>(factory);
+
             factory.Register<string, StorageProductUpdateMarketplaceStockInfo>(new ConsumerConfig()
             {
                 GroupId = nameof(StorageProductUpdateMarketplaceStockInfo),

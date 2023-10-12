@@ -10,6 +10,8 @@ using Hangfire;
 using System.Threading;
 using System.Collections.ObjectModel;
 using System.Reactive;
+using App.Metrics;
+using Storage.Infrastructure.Metrics;
 
 namespace Storage.Api.Kafka.Services
 {
@@ -27,12 +29,17 @@ namespace Storage.Api.Kafka.Services
 
         private readonly IProducerFactory _producerFactory;
 
+        private readonly IMetrics _metrics;
+
         public CService_ProductStorageRegistration(
+            IMetrics metrics,
             IConsumerFactory consumerFactory,
             IProducerFactory producerFactory,
             IServiceRepository<StorageProduct> repo,
             ILogger<CService_ProductStorageRegistration> logger)
         {
+            _metrics = metrics;
+
             _producerFactory = producerFactory;
             _consumerFactory = consumerFactory;
 
@@ -70,6 +77,8 @@ namespace Storage.Api.Kafka.Services
 
                 data.Subscribe(messages =>
                     {
+                        _metrics.Measure.Counter.Increment(StorageMetricsRegistry.Kafka_productRegistrationCounter);
+
                         _logger.LogInformation($"[{nameof(CService_ProductStorageRegistration)}] msgs received: {messages.Count} {messages[0].MarketplaceProductId}");
 
                         _storageProductsRepository.AddRange(

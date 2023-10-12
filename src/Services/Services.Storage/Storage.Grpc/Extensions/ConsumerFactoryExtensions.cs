@@ -11,6 +11,17 @@ namespace Storage.Grpc.Extensions
             this IServiceCollection services,
             string kafkaHost)
         {
+            //var factory = new ConsumerFactory();
+
+            //factory.Register<string, MarketplaceProductStorageRegistrationRead>(new ConsumerConfig()
+            //{
+            //    GroupId = nameof(MarketplaceProductStorageRegistrationRead),
+            //    AutoOffsetReset = AutoOffsetReset.Latest,
+            //    BootstrapServers = kafkaHost,
+            //    EnableAutoCommit = false,
+            //    AutoCommitIntervalMs = 0,
+            //    Acks = Acks.Leader
+            //});
 
             //services.AddSingleton<IConsumerFactory>(factory);
         }

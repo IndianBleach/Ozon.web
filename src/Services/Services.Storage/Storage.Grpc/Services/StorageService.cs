@@ -9,6 +9,8 @@ using Storage.Data.Entities.Products;
 using Confluent.Kafka;
 using Microsoft.Extensions.Logging;
 using System.Collections.ObjectModel;
+using App.Metrics;
+using Storage.Infrastructure.Metrics;
 
 namespace Storage.Grpc.Services
 {
@@ -20,10 +22,15 @@ namespace Storage.Grpc.Services
 
         private readonly IProducerFactory _producerFactory;
 
+        private IMetrics _metrics;
+
         public StorageService(
+            IMetrics metrics,
             IProducerFactory producerFactory,
             ILogger<StorageService> logger)
         {
+            _metrics = metrics;
+
             _producerFactory = producerFactory;
 
             _logger = logger;
@@ -37,11 +44,13 @@ namespace Storage.Grpc.Services
 
             List<MarketplaceProductStorageRegistrationRead> values = new List<MarketplaceProductStorageRegistrationRead>();
 
-            await requestStream.ForEachAsync(async (x) => values.Add(new MarketplaceProductStorageRegistrationRead
-            { 
-                MarketplaceProductId = x.MarketplaceProductId,
-                StorageId = x.StorageId
-            }));
+            await requestStream.ForEachAsync(async (x) => {
+                values.Add(new MarketplaceProductStorageRegistrationRead
+                {
+                    MarketplaceProductId = x.MarketplaceProductId,
+                    StorageId = x.StorageId
+                });
+            });
 
             try
             {
@@ -49,7 +58,10 @@ namespace Storage.Grpc.Services
                 {
                     _logger.LogInformation("[add to queue grpc-storage-registrationProducts] msgs " + values.Count);
 
-                    // add to bus
+                    _metrics.Measure.Counter.Increment(
+                        options: StorageMetricsRegistry.gRPC_productRegistrationCounter,
+                        amount: values.Count);
+
                     _productsStorageRegistrationQueue.PublishMessage(
                         toTopicAddr: "grpc-storage-registrationProducts",
                         message: new Message<string, List<MarketplaceProductStorageRegistrationRead>>

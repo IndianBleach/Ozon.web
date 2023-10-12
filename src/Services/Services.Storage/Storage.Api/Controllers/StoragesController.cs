@@ -1,3 +1,4 @@
+using App.Metrics;
 using AutoMapper;
 using Azure.Core;
 using Common.DataQueries;
@@ -30,6 +31,8 @@ namespace Storage.Api.Controllers
 
         private IMapper _mapper;
 
+        private IMetrics _metrics;
+
         private readonly ILogger<StoragesController> _logger;
 
         private readonly IServiceRepository<MarketStorage> _storageRepository;
@@ -45,6 +48,7 @@ namespace Storage.Api.Controllers
         private IServiceRepository<StorageProduct> _productsRepository;
 
         public StoragesController(
+            IMetrics metrics,
             IProducerFactory producerFactory,
             ILogger<StoragesController> logger,
             IServiceRepository<MarketStorage> storageRepository,
@@ -54,6 +58,8 @@ namespace Storage.Api.Controllers
             IServiceRepository<StorageActionType> actionTypesRepository,
             IServiceRepository<StorageProduct> productsRepository)
         {
+            _metrics = metrics;
+
             _producerFactory = producerFactory;
 
             _productsRepository = productsRepository;
@@ -71,7 +77,6 @@ namespace Storage.Api.Controllers
 
             _mapper = new Mapper(config);
         }
-
 
         [HttpPost("/actions")]
         public async Task<IActionResult> CreateActionType(
@@ -197,7 +202,7 @@ namespace Storage.Api.Controllers
             var dtos = _productsRepository.Find(new ProductsOnStorageSpec(
                 onStorageId: storage_id));
 
-            return Ok(dtos);
+            return Ok(_mapper.Map<IEnumerable<StorageProduct>, StorageProductRead[]>(dtos));
         }
 
         [HttpGet("/{storage_id:int}/cells")]
@@ -206,7 +211,7 @@ namespace Storage.Api.Controllers
             var dtos = _storageCellRepository.Find(new CellsOnStorageSpec(
                 storageId: storage_id));
 
-            return Ok(dtos);
+            return Ok(_mapper.Map<IEnumerable<StorageCell>, StorageCellRead[]>(dtos));
         }
     }
 }
