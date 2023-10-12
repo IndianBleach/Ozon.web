@@ -2,14 +2,14 @@ version: "3.8"
 services:
 
 #click-house
-  # click-house:
-  #   container_name: click-house
-  #   image: yandex/clickhouse-server
-  #   ports:
-  #     - "2183:2183"
-  #     - "8123:8123"
-  #   networks:
-  #     - ozon-net
+  click-house:
+    container_name: click-house
+    image: yandex/clickhouse-server
+    ports:
+      - "2183:2183"
+      - "8123:8123"
+    networks:
+      - ozon-net
 
 
 # #kafka
@@ -88,6 +88,7 @@ services:
     networks:
      - ozon-net
 
+
   storage-api:
     container_name: storage-api
     build: 
@@ -101,6 +102,8 @@ services:
     depends_on:
       - storage-mssql
       - kafka-broker
+      - click-house
+      #- ozon-simulator
 
   storage-grpc:
     container_name: storage-grpc
@@ -194,6 +197,39 @@ services:
   #  ports:
   #    - "5001:80"
   #    - "5000:443"
+
+
+  #simulator
+  # ozon-simulator:
+  #   container_name: ozon-simulator
+  #   build: 
+  #     context: .
+  #     dockerfile: ./Ozon.Simulator/Dockerfile
+  #   networks:
+  #     - ozon-net
+
+
+#monitoring
+  prometheus:
+    container_name: metrics-prometheus
+    image: prom/prometheus
+    networks:
+      - ozon-net
+    ports:
+      - "9090:9090"
+    volumes:
+      - .volumes/metrics/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - .volumes/metrics/prometheus/data:/prometheus 
+
+  grafana:
+    image: grafana/grafana
+    container_name: metrics-grafana
+    ports:
+      - "3000:3000"
+    volumes:
+      - ".volumes/metrics/grafana:/var/lib/grafana"
+    networks:
+      - ozon-net
 
 #api
   ozon-api:

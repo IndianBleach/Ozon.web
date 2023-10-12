@@ -21,6 +21,11 @@ namespace Accounts.Infrastructure.Repositories
             _dbContext = dbContext;
         }
 
+        public int AddRange(T[] entities)
+        {
+            throw new NotImplementedException();
+        }
+
         public bool Any(Func<T, bool> predicate)
         {
             return _dbContext.Set<T>().Any(predicate);

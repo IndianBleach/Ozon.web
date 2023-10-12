@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Ozon.Bus.DTOs.StorageService
 {
-    public class SyncProductRegistryInfoRequest
+    public class SyncProductRegistryInfoRequest : TMessageBusValue
     {
         public string? ExternalProductId { get; set; }
 

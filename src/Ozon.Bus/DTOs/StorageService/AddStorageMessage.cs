@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Ozon.Bus.DTOs.StorageService
 {
-    public class AddStorageMessage
+    public class AddStorageMessage : TMessageBusValue
     {
         public int? ExternalStorageId { get; set; }
 

@@ -8,13 +8,15 @@ using Storage.Data.Entities.Products;
 using Ozon.Bus.Serdes;
 using Hangfire;
 using System.Threading;
+using System.Collections.ObjectModel;
+using System.Reactive;
+using App.Metrics;
+using Storage.Infrastructure.Metrics;
 
 namespace Storage.Api.Kafka.Services
 {
     public class CService_ProductStorageRegistration
     {
-        private Producer<string, List<StorageProductUpdateMarketplaceStockInfo>> _productsUpdateStockStatusProducer;
-
         private readonly IServiceRepository<StorageProduct> _storageProductsRepository;
 
         private readonly ILogger<CService_ProductStorageRegistration> _logger;
@@ -23,28 +25,32 @@ namespace Storage.Api.Kafka.Services
 
         private readonly IMapper _mapper;
 
+        private readonly IConsumerFactory _consumerFactory;
+
+        private readonly IProducerFactory _producerFactory;
+
+        private readonly IMetrics _metrics;
+
         public CService_ProductStorageRegistration(
+            IMetrics metrics,
+            IConsumerFactory consumerFactory,
+            IProducerFactory producerFactory,
             IServiceRepository<StorageProduct> repo,
             ILogger<CService_ProductStorageRegistration> logger)
         {
+            _metrics = metrics;
+
+            _producerFactory = producerFactory;
+            _consumerFactory = consumerFactory;
+
             _storageProductsRepository = repo;
 
             _logger = logger;
-
-            _kafkaServer = "kafka-broker:9092";
 
             var config = new MapperConfiguration(cfg => cfg.AddProfiles(new List<Profile> {
                 new MarketplaceProductToStorageProductProfile()
             }));
             _mapper = new Mapper(config);
-
-            _productsUpdateStockStatusProducer = new Producer<string, List<StorageProductUpdateMarketplaceStockInfo>>(
-                config: new ProducerConfig()
-                {
-                    BootstrapServers = _kafkaServer,
-                    Acks = Acks.Leader,
-                    EnableBackgroundPoll = false,
-                });
         }
 
         [Queue("consumers")]
@@ -54,59 +60,59 @@ namespace Storage.Api.Kafka.Services
 
             CancellationTokenSource token = new CancellationTokenSource();
 
+            ConsumerWrapper<string, ReadOnlyCollection<MarketplaceProductStorageRegistrationRead>>? consumer = _consumerFactory
+                .GetBatch<string, MarketplaceProductStorageRegistrationRead>();
+
+            if (consumer == null)
+            {
+                _logger.LogCritical("cannot find consumer [MarketplaceProductStorageRegistrationRead]");
+                return;
+            }
+
+            ProducerWrapper<string, List<StorageProductUpdateMarketplaceStockInfo>>? producer = _producerFactory.GetBatch<string, StorageProductUpdateMarketplaceStockInfo>();
+
             try
             {
-                Consumer<string, List<MarketplaceProductStorageRegistrationRead>> consumer = new Consumer<string, List<MarketplaceProductStorageRegistrationRead>>(
-                    config: new ConsumerConfig()
-                    {
-                        GroupId = nameof(CService_ProductStorageRegistration),
-                        AutoOffsetReset = AutoOffsetReset.Latest,
-                        BootstrapServers = _kafkaServer,
-                        EnableAutoCommit = false,
-                        AutoCommitIntervalMs = 0,
-                    },
-                    valueDeserializator: new ServiceBusValueDeserializer<List<MarketplaceProductStorageRegistrationRead>>(),
-                    onExeption: (sender, exp) => {
-                        Console.WriteLine("[CANCEL TOKEN]");
-                        //consumer.close
-                        token.Cancel();
-                    });
+                var data = consumer.ObservableData(new string[] { "grpc-storage-registrationProducts" });
 
-                var observer = consumer.ConsumeObserv(new List<string> { "grpc-storage-registrationProducts" });
-
-                observer.Subscribe(
-                    messages =>
+                data.Subscribe(messages =>
                     {
-                        _logger.LogCritical($"[{nameof(CService_ProductStorageRegistration)}] msgs received: {messages.Count} {messages[0].MarketplaceProductId}");
+                        _metrics.Measure.Counter.Increment(StorageMetricsRegistry.Kafka_productRegistrationCounter);
+
+                        _logger.LogInformation($"[{nameof(CService_ProductStorageRegistration)}] msgs received: {messages.Count} {messages[0].MarketplaceProductId}");
 
                         _storageProductsRepository.AddRange(
                             _mapper.Map<IEnumerable<MarketplaceProductStorageRegistrationRead>, StorageProduct[]>(messages));
 
                         // +bus services.marketplace (update products status)[_batch]
-                        _logger.LogWarning($"[{nameof(CService_ProductStorageRegistration)}] (+bus) send to marketplace (storage-marketplace-updateProductStorageStockInfo): {messages.Count} {messages[0].MarketplaceProductId}");
+                        _logger.LogInformation($"[{nameof(CService_ProductStorageRegistration)}] (+bus) send to marketplace (storage-marketplace-updateProductStorageStockInfo): {messages.Count} {messages[0].MarketplaceProductId}");
 
-                        _productsUpdateStockStatusProducer.PublishMessage(
-                            toTopicAddr: "storage-marketplace-updateProductStorageStockInfo",
-                            message: new Message<string, List<StorageProductUpdateMarketplaceStockInfo>>
-                            {
-                                Key = Guid.NewGuid().ToString(),
-                                Value = messages.Select(x => new StorageProductUpdateMarketplaceStockInfo
+                        if (producer != null)
+                        {
+                            producer.PublishMessage(
+                                toTopicAddr: "storage-marketplace-updateProductStorageStockInfo",
+                                message: new Message<string, List<StorageProductUpdateMarketplaceStockInfo>>
                                 {
-                                    MarketplaceProductId = x.MarketplaceProductId,
-                                    NewStockStatusName = StorageServiceBusConstants.PRODUCT_STOCK_AVAILABLE_STATUS,
-                                    StorageId = x.StorageId
-                                }).ToList()
-                            });
-
+                                    Key = Guid.NewGuid().ToString(),
+                                    Value = messages.Select(x => new StorageProductUpdateMarketplaceStockInfo
+                                    {
+                                        MarketplaceProductId = x.MarketplaceProductId,
+                                        NewStockStatusName = StorageServiceBusConstants.PRODUCT_STOCK_AVAILABLE_STATUS,
+                                        StorageId = x.StorageId
+                                    }).ToList()
+                                });
+                        }
+                        else _logger.LogCritical("[StorageProductUpdateMarketplaceStockInfo] producer not found");
+                        
                         // testing
                         consumer.Commit();
                     });
 
-                consumer.Start(token.Token);
+                consumer.StartConsume(token.Token);
             }
             catch (Exception exp)
             {
-                _logger.LogError("spec erorr: " + exp.Message);
+                _logger.LogCritical("[CService_ProductStorageRegistration] global error: " + exp.Message);
             }
         }
     }

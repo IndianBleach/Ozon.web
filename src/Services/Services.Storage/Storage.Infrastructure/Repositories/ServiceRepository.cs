@@ -20,7 +20,7 @@ namespace Storage.Infrastructure.Repositories
         {
             _dbContext.Set<T>().AddRange(entities);
 
-            return 0;
+            return _dbContext.SaveChanges();
         }
 
         public bool Any(Func<T, bool> predicate)
