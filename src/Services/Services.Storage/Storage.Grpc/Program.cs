@@ -1,14 +1,27 @@
+using App.Metrics.AspNetCore;
+using App.Metrics.Formatters.Prometheus;
 using Common.Repositories;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Storage.Data.Context;
-using Storage.Grpc.ClickHouse;
+using Storage.Grpc.Extensions;
 using Storage.Grpc.Services;
 using Storage.Infrastructure.Repositories;
 using System.Net;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Host.UseMetricsWebTracking();
+builder.Host.UseMetrics(options => {
+    options.EndpointOptions = (endpointOpt) => {
+        endpointOpt.MetricsTextEndpointOutputFormatter = new MetricsPrometheusTextOutputFormatter();
+        endpointOpt.MetricsEndpointOutputFormatter = new MetricsPrometheusProtobufOutputFormatter();
+        endpointOpt.EnvironmentInfoEndpointEnabled = true;
+    };
+});
+
+builder.Services.AddMetrics();
 
 builder.Services.AddGrpc();
 
@@ -29,6 +42,8 @@ Console.WriteLine("[After house]");
 builder.Services.AddGrpc();
 
 builder.Services.AddGrpcReflection();
+
+builder.Services.AddProducerFactory("kafka-broker:9092");
 
 
 var app = builder.Build();

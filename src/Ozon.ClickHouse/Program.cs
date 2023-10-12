@@ -46,81 +46,23 @@ Task.Run(async () =>
 {
     var connection = new ClickHouseConnection($"Host=localhost;Protocol=http;Port=8123;");
 
-    DataTable ans1 = connection.ExecuteDataTable("select * from default.Actions7");
+    string queryQueue = @$"
+                SELECT 
+                             storage_id,
+                             COUNT(storage_cell_id) AS countNow
+                             FROM (SELECT 
+                                    m1.storage_id,
+                                    m1.storage_cell_id,
+                                    (SELECT m2.action_id FROM ProductStorage.ProductMovements m2
+                                    WHERE m2.storage_cell_id == m1.storage_cell_id
+                                    ORDER BY m2.timestamp DESC,
+                                    LIMIT 1) AS cell_state
+                                  FROM ProductStorage.ProductMovements m1) AS tmp_table
+                             WHERE tmp_table.cell_state = 1
+                             GROUP BY storage_id";
+    var ans2 = await connection.ExecuteReaderAsync(queryQueue);
 
-    int s = 0;
-    foreach (DataColumn item in ans1.Columns)
-    {
-        Console.Write(item.ColumnName + " ");
-    }
-
-    foreach (DataRow item in ans1.Rows)
-    {
-        foreach (var cell in item.ItemArray)
-        {
-            Console.Write(cell + " ");
-        }
-        Console.WriteLine("");
-    }
-
-    //var ans = await connection.ExecuteScalarAsync("SET input_format_import_nested_json=1");
-
-    //string queryQueue = @$"
-    //            CREATE TABLE default.queue9 (
-    //                Number Int32,
-    //                Name String
-    //            ) ENGINE = Kafka('kafka-broker:9092', 'juice', 'g{Guid.NewGuid()}', 'JSONEachRow')";
-    //var ans2 = await connection.ExecuteScalarAsync(queryQueue);
-
-    //string queryActionsTable = @$"
-    //            CREATE TABLE IF NOT EXISTS default.store9 (
-    //                Number Int32,
-    //                Name String
-    //            ) ENGINE = MergeTree ORDER BY (Number)";
-    //var ans3 = await connection.ExecuteScalarAsync(queryActionsTable);
-
-    //string queryView = @$"
-    //            CREATE MATERIALIZED VIEW default.mv9 TO default.store9
-    //            AS SELECT * FROM default.queue9;";
-    //var ans4 = await connection.ExecuteScalarAsync(queryView);
-
-
-    //#region Init
-    //string queryQueue = @$"
-    //            CREATE TABLE default.ActionsQueue7 (
-    //                storage_id Int32,
-    //                employee_id Int32,
-    //                action_id Int32,
-    //                action_name String,
-    //                storage_cell_id Int32,
-    //                storage_cell_name String,
-    //                storage_product_id Int32,
-    //                external_product_id UUID
-    //            ) ENGINE = Kafka('kafka-broker:9092', 'chance', 'cons{Guid.NewGuid()}', 'JSONEachRow')";
-    //var ans2 = await connection.ExecuteScalarAsync(queryQueue);
-
-    //string queryActionsTable = @$"
-    //            CREATE TABLE IF NOT EXISTS default.Actions7 (
-    //                storage_id Int32,
-    //                employee_id Int32,
-    //                action_id Int32,
-    //                action_name String,
-    //                storage_cell_id Int32,
-    //                storage_cell_name String,
-    //                storage_product_id Int32,
-    //                external_product_id UUID
-    //            ) ENGINE = MergeTree ORDER BY (action_id)";
-    //var ans3 = await connection.ExecuteScalarAsync(queryActionsTable);
-
-    //string queryView = @$"
-    //            CREATE MATERIALIZED VIEW default.actions_mv7 TO default.Actions7
-    //            AS SELECT * FROM default.ActionsQueue7;";
-    //var ans4 = await connection.ExecuteScalarAsync(queryView);
-
-    int t = 1;
-    //#endregion
-
-
+    int T = 1;
 
 }).Wait();
 

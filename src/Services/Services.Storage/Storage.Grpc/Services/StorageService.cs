@@ -8,6 +8,9 @@ using Ozon.Common.Logging;
 using Storage.Data.Entities.Products;
 using Confluent.Kafka;
 using Microsoft.Extensions.Logging;
+using System.Collections.ObjectModel;
+using App.Metrics;
+using Storage.Infrastructure.Metrics;
 
 namespace Storage.Grpc.Services
 {
@@ -15,20 +18,24 @@ namespace Storage.Grpc.Services
     {
         private readonly ILogger<StorageService> _logger;
 
-        private readonly Producer<string, List<MarketplaceProductStorageRegistrationRead>> _productsStorageRegistrationQueue;
+        private readonly ProducerWrapper<string, List<MarketplaceProductStorageRegistrationRead>>? _productsStorageRegistrationQueue;
+
+        private readonly IProducerFactory _producerFactory;
+
+        private IMetrics _metrics;
 
         public StorageService(
+            IMetrics metrics,
+            IProducerFactory producerFactory,
             ILogger<StorageService> logger)
         {
+            _metrics = metrics;
+
+            _producerFactory = producerFactory;
+
             _logger = logger;
 
-            _productsStorageRegistrationQueue = new Producer<string, List<MarketplaceProductStorageRegistrationRead>>(
-                config: new ProducerConfig()
-                {
-                    BootstrapServers = "kafka-broker:9092",
-                    Acks = Acks.Leader,
-                    EnableBackgroundPoll = false,
-                });
+            _productsStorageRegistrationQueue = producerFactory.GetBatch<string, MarketplaceProductStorageRegistrationRead>();
         }
 
         public override async Task<QueryStringIdResult> AddProductsToStorage(IAsyncStreamReader<AddProductToStorageRequest> requestStream, ServerCallContext context)
@@ -37,29 +44,40 @@ namespace Storage.Grpc.Services
 
             List<MarketplaceProductStorageRegistrationRead> values = new List<MarketplaceProductStorageRegistrationRead>();
 
-            await requestStream.ForEachAsync(async (x) => values.Add(new MarketplaceProductStorageRegistrationRead
-            { 
-                MarketplaceProductId = x.MarketplaceProductId,
-                StorageId = x.StorageId
-            }));
+            await requestStream.ForEachAsync(async (x) => {
+                values.Add(new MarketplaceProductStorageRegistrationRead
+                {
+                    MarketplaceProductId = x.MarketplaceProductId,
+                    StorageId = x.StorageId
+                });
+            });
 
             try
             {
-                _logger.LogCritical("[add to queue grpc-storage-registrationProducts] msgs " + values.Count);
+                if (_productsStorageRegistrationQueue != null)
+                {
+                    _logger.LogInformation("[add to queue grpc-storage-registrationProducts] msgs " + values.Count);
 
-                // add to bus
-                _productsStorageRegistrationQueue.PublishMessage(
-                    toTopicAddr: "grpc-storage-registrationProducts",
-                    message: new Message<string, List<MarketplaceProductStorageRegistrationRead>>
-                    {
-                        Key = Guid.NewGuid().ToString(),
-                        Value = values
-                    });
+                    _metrics.Measure.Counter.Increment(
+                        options: StorageMetricsRegistry.gRPC_productRegistrationCounter,
+                        amount: values.Count);
+
+                    _productsStorageRegistrationQueue.PublishMessage(
+                        toTopicAddr: "grpc-storage-registrationProducts",
+                        message: new Message<string, List<MarketplaceProductStorageRegistrationRead>>
+                        {
+                            Key = Guid.NewGuid().ToString(),
+                            Value = values
+                        });
+
+                    
+                } else _logger.LogCritical("[MarketplaceProductStorageRegistrationRead] cannot find producer" + values.Count);
 
                 return new QueryStringIdResult
                 {
                     SuccessValueId = values.First().MarketplaceProductId
                 };
+
             }
             catch (Exception exp)
             {

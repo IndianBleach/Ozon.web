@@ -3,7 +3,7 @@ using Hangfire;
 using Hangfire.MemoryStorage;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.EntityFrameworkCore;
-using Products.Api.Kafka.Producers;
+using Products.Api.Extensions;
 using Products.Data.Context;
 using Products.Infrastructure.Repositories;
 using System.Net;
@@ -26,7 +26,8 @@ builder.Services.AddDbContext<ApplicationContext>(options => options.UseSqlServe
 
 builder.Services.AddScoped(typeof(IServiceRepository<>), typeof(ServiceRepository<>));
 
-builder.Services.AddScoped<IMarketplaceProducer, MarketplaceProducer>();
+builder.Services.AddConsumerFactory("kafka-broker:9092");
+builder.Services.AddProducerFactory("kafka-broker:9092");
 
 builder.Services.AddControllers();
 

@@ -1,5 +1,6 @@
 ﻿using Hangfire;
 using Microsoft.AspNetCore.Mvc;
+using Storage.Api.ClickHouse;
 using Storage.Api.Kafka.Services;
 
 namespace Storage.Api.Controllers
@@ -8,8 +9,13 @@ namespace Storage.Api.Controllers
     {
         private readonly IBackgroundJobClient _jobClient;
 
-        public DeveloperController(IBackgroundJobClient jobClient)
+        private IClickHouseStorageClient _chCLient;
+
+        public DeveloperController(
+            IClickHouseStorageClient chClient,
+            IBackgroundJobClient jobClient)
         {
+            _chCLient = chClient;
             _jobClient = jobClient;
         }
 

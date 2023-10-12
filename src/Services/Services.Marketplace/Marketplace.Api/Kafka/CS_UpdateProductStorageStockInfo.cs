@@ -7,6 +7,8 @@ using Ozon.Bus.Serdes;
 using Hangfire;
 using System.Threading;
 using Marketplace.Infrastructure.BusServices;
+using System.Collections.ObjectModel;
+using System.Reactive;
 
 namespace Storage.Api.Kafka.Services
 {
@@ -22,10 +24,15 @@ namespace Storage.Api.Kafka.Services
 
         private readonly IMarketplaceProductBusService _productsBusService;
 
+        private readonly IConsumerFactory _consumerFactory;
+
         public CService_ProductStorageRegistration(
+            IConsumerFactory consumerFactory,
             IMarketplaceProductBusService productBusService,
             ILogger<CService_ProductStorageRegistration> logger)
         {
+            _consumerFactory = consumerFactory;
+
             _productsBusService = productBusService;
 
             _logger = logger;
@@ -53,30 +60,17 @@ namespace Storage.Api.Kafka.Services
 
             CancellationTokenSource token = new CancellationTokenSource();
 
-            try
+            ConsumerWrapper<string, ReadOnlyCollection<StorageProductUpdateMarketplaceStockInfo>>? consumer = _consumerFactory.GetBatch<string, StorageProductUpdateMarketplaceStockInfo>();
+
+            if (consumer != null)
             {
-                Consumer<string, List<StorageProductUpdateMarketplaceStockInfo>> consumer = new Consumer<string, List<StorageProductUpdateMarketplaceStockInfo>>(
-                    config: new ConsumerConfig()
-                    {
-                        GroupId = nameof(CService_ProductStorageRegistration),
-                        AutoOffsetReset = AutoOffsetReset.Latest,
-                        BootstrapServers = _kafkaServer,
-                        EnableAutoCommit = false,
-                        AutoCommitIntervalMs = 0,
-                    },
-                    valueDeserializator: new ServiceBusValueDeserializer<List<StorageProductUpdateMarketplaceStockInfo>>(),
-                    onExeption: (sender, exp) => {
-                        Console.WriteLine("[CANCEL TOKEN]");
-                        //consumer.close
-                        token.Cancel();
-                    });
+                try
+                {
+                    var data = consumer.ObservableData(new string[] { "storage-marketplace-updateProductStorageStockInfo" });
 
-                var observer = consumer.ConsumeObserv(new List<string> { "storage-marketplace-updateProductStorageStockInfo" });
-
-                // update marketplace product storages stock info
-                observer.Subscribe((messages) =>
+                    data.Subscribe((messages) =>
                     {
-                        _logger.LogCritical($"[{nameof(CService_ProductStorageRegistration)}] msgs received: {messages.Count} {messages[0].MarketplaceProductId}");
+                        _logger.LogInformation($"[{nameof(CService_ProductStorageRegistration)}] msgs received: {messages.Count} {messages[0].MarketplaceProductId}");
 
                         _productsBusService.UpdateProductsStorageInfo(
                             products: messages);
@@ -85,11 +79,12 @@ namespace Storage.Api.Kafka.Services
                         consumer.Commit();
                     });
 
-                consumer.Start(token.Token);
-            }
-            catch (Exception exp)
-            {
-                _logger.LogError("spec erorr: " + exp.Message);
+                    consumer.StartConsume(token.Token);
+                }
+                catch (Exception exp)
+                { 
+                    
+                }
             }
         }
     }

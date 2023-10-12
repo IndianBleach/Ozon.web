@@ -11,7 +11,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Accounts.Infrastructure", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Common", "Common\Common.csproj", "{868EC8BD-620E-4F06-A7E5-93BC76B7F50B}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Services.Storage", "Services.Storage", "{ECC3CAB6-D8CA-4AB5-8CFA-D2249DA2624E}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Services.ProductStorage", "Services.ProductStorage", "{ECC3CAB6-D8CA-4AB5-8CFA-D2249DA2624E}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Storage.Grpc", "Services\Services.Storage\Storage.Grpc\Storage.Grpc.csproj", "{015220B7-85EF-4B40-BC5F-531F3E7BA206}"
 EndProject
@@ -35,8 +35,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Storage.Infrastructure", "S
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ozon.SeedClient", "Ozon.SeedClient\Ozon.SeedClient.csproj", "{EA8DE47D-C4A0-4640-8FCD-AA9FCE69FA87}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ozon.ClickHouse", "Ozon.ClickHouse\Ozon.ClickHouse.csproj", "{13E4E6DB-0668-421D-A2D5-1602AF6A5D88}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Marketplace.Infrastructure", "Services\Services.Marketplace\Marketplace.Infrastructure\Marketplace.Infrastructure.csproj", "{7982567E-7FC9-4389-876E-3EC435EF560B}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ozon.Bus", "Ozon.Bus\Ozon.Bus.csproj", "{9E883562-FC1D-425D-A2D6-BC2190B06234}"
@@ -52,6 +50,10 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Authorization.RestApi", "Services\Services.Authorization\Authorization.RestApi\Authorization.RestApi.csproj", "{46FDFEE9-7653-4714-BFF0-8285C68BA24F}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tests", "..\Tests\Tests.csproj", "{AC41BE30-C199-4DF3-B79B-9E0E5CAF6D4A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ozon.ClickHouse", "Ozon.ClickHouse\Ozon.ClickHouse.csproj", "{AC10979C-C28C-4900-9952-A66C357280FE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ozon.Simulator", "Ozon.Simulator\Ozon.Simulator.csproj", "{6DAD5954-E155-4650-8B3B-E036D0FA4404}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -103,10 +105,6 @@ Global
 		{EA8DE47D-C4A0-4640-8FCD-AA9FCE69FA87}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EA8DE47D-C4A0-4640-8FCD-AA9FCE69FA87}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EA8DE47D-C4A0-4640-8FCD-AA9FCE69FA87}.Release|Any CPU.Build.0 = Release|Any CPU
-		{13E4E6DB-0668-421D-A2D5-1602AF6A5D88}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{13E4E6DB-0668-421D-A2D5-1602AF6A5D88}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{13E4E6DB-0668-421D-A2D5-1602AF6A5D88}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{13E4E6DB-0668-421D-A2D5-1602AF6A5D88}.Release|Any CPU.Build.0 = Release|Any CPU
 		{7982567E-7FC9-4389-876E-3EC435EF560B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{7982567E-7FC9-4389-876E-3EC435EF560B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7982567E-7FC9-4389-876E-3EC435EF560B}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -139,6 +137,14 @@ Global
 		{AC41BE30-C199-4DF3-B79B-9E0E5CAF6D4A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AC41BE30-C199-4DF3-B79B-9E0E5CAF6D4A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AC41BE30-C199-4DF3-B79B-9E0E5CAF6D4A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AC10979C-C28C-4900-9952-A66C357280FE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AC10979C-C28C-4900-9952-A66C357280FE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AC10979C-C28C-4900-9952-A66C357280FE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AC10979C-C28C-4900-9952-A66C357280FE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6DAD5954-E155-4650-8B3B-E036D0FA4404}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6DAD5954-E155-4650-8B3B-E036D0FA4404}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6DAD5954-E155-4650-8B3B-E036D0FA4404}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6DAD5954-E155-4650-8B3B-E036D0FA4404}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

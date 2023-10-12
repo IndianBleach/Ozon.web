@@ -5,6 +5,7 @@ using Marketplace.Infrastructure.BusServices;
 using Ozon.Bus.DTOs.StorageService;
 using Ozon.Bus.Serdes;
 using Ozon.Bus;
+using System.Reactive;
 
 namespace Marketplace.Api.Kafka
 {
@@ -16,12 +17,17 @@ namespace Marketplace.Api.Kafka
 
         private readonly IMapper _mapper;
 
+        private readonly IConsumerFactory _consumerFactory;
+
         private readonly IMarketplaceProductBusService _productsBusService;
 
         public CS_UpdateProductRegistryInfo(
+            IConsumerFactory consumerFactory,
             IMarketplaceProductBusService productBusService,
             ILogger<CS_UpdateProductRegistryInfo> logger)
         {
+            _consumerFactory = consumerFactory;
+
             _productsBusService = productBusService;
 
             _logger = logger;
@@ -36,28 +42,15 @@ namespace Marketplace.Api.Kafka
 
             CancellationTokenSource token = new CancellationTokenSource();
 
-            try
+            ConsumerWrapper<string, SyncProductRegistryInfoAnswer>? consumer = _consumerFactory.GetSingle<string, SyncProductRegistryInfoAnswer>();
+
+            if (consumer != null)
             {
-                Consumer<Ignore, SyncProductRegistryInfoAnswer> consumer = new Consumer<Ignore, SyncProductRegistryInfoAnswer>(
-                    config: new ConsumerConfig()
-                    {
-                        GroupId = nameof(CS_UpdateProductRegistryInfo),
-                        AutoOffsetReset = AutoOffsetReset.Earliest,
-                        BootstrapServers = _kafkaServer,
-                        EnableAutoCommit = false,
-                        AutoCommitIntervalMs = 0,
-                    },
-                    valueDeserializator: new ServiceBusValueDeserializer<SyncProductRegistryInfoAnswer>(),
-                    onExeption: (sender, exp) => {
-                        Console.WriteLine("[CANCEL TOKEN]");
-                        //consumer.close
-                        token.Cancel();
-                    });
+                try
+                {
+                    var data = consumer.ObservableData(new List<string> { "marketplace-products.syncProductRegistryInfo-answer" });
 
-                var observer = consumer.ConsumeObserv(new List<string> { "marketplace-products.syncProductRegistryInfo-answer" });
-
-                // update marketplace product storages stock info
-                observer.Subscribe((message) =>
+                    data.Subscribe((message) =>
                     {
                         _productsBusService.UpdateProductSeller(
                             marketplaceProductId: message.MarketplaceProductId,
@@ -70,13 +63,17 @@ namespace Marketplace.Api.Kafka
                             price: message.DefaultPrice);
 
                         _logger.LogCritical($"[{nameof(CS_UpdateProductRegistryInfo)}] msgs received: {message.Title}");
+
+                        // testing
+                        consumer.Commit();
                     });
 
-                consumer.Start(token.Token);
-            }
-            catch (Exception exp)
-            {
-                _logger.LogError("spec erorr: " + exp.Message);
+                    consumer.StartConsume(token.Token);
+                }
+                catch (Exception exp)
+                {
+                    _logger.LogError("spec erorr: " + exp.Message);
+                }
             }
         }
     }

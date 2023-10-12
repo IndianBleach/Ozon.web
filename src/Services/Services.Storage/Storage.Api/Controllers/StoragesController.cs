@@ -1,12 +1,15 @@
+using App.Metrics;
 using AutoMapper;
 using Azure.Core;
 using Common.DataQueries;
 using Common.DTOs.Storage;
 using Common.Grpc.Extensions;
 using Common.Repositories;
+using Confluent.Kafka;
 using Hangfire;
 using Microsoft.AspNetCore.Mvc;
-using Storage.Api.Kafka.Producers;
+using Ozon.Bus;
+using Ozon.Bus.DTOs.StorageService;
 using Storage.Api.Kafka.Services;
 using Storage.Data.Entities.Actions;
 using Storage.Data.Entities.Address;
@@ -24,9 +27,11 @@ namespace Storage.Api.Controllers
     [Produces("application/json")]
     public class StoragesController : ControllerBase
     {
-        private IMarketplaceProducer _marketplaceProducer;
+        private IProducerFactory _producerFactory;
 
         private IMapper _mapper;
+
+        private IMetrics _metrics;
 
         private readonly ILogger<StoragesController> _logger;
 
@@ -43,7 +48,8 @@ namespace Storage.Api.Controllers
         private IServiceRepository<StorageProduct> _productsRepository;
 
         public StoragesController(
-            IMarketplaceProducer marketplaceProducer,
+            IMetrics metrics,
+            IProducerFactory producerFactory,
             ILogger<StoragesController> logger,
             IServiceRepository<MarketStorage> storageRepository,
             IServiceRepository<StorageCell> cellRepository,
@@ -52,7 +58,10 @@ namespace Storage.Api.Controllers
             IServiceRepository<StorageActionType> actionTypesRepository,
             IServiceRepository<StorageProduct> productsRepository)
         {
-            _marketplaceProducer = marketplaceProducer;
+            _metrics = metrics;
+
+            _producerFactory = producerFactory;
+
             _productsRepository = productsRepository;
             _storageCellRepository = cellRepository;
             _addressRepository = addrRepository;
@@ -68,7 +77,6 @@ namespace Storage.Api.Controllers
 
             _mapper = new Mapper(config);
         }
-
 
         [HttpPost("/actions")]
         public async Task<IActionResult> CreateActionType(
@@ -132,11 +140,31 @@ namespace Storage.Api.Controllers
 
             if (storeResult.IsSuccessed)
             {
-                _marketplaceProducer.AddMarketplaceStorage(
-                    externalStorageId: storeResult.Value.Id,
-                    city: addrCity,
-                    street: addrStreet,
-                    building: addrBuilding);
+                var producer = _producerFactory.Get<string, AddStorageMessage>();
+
+                if (producer != null)
+                {
+                    _logger.LogInformation("+msg to [storage-marketplace.addMarketplaceStorage] storageId: " + storeResult.Value.Id);
+
+                    producer.PublishMessage(
+                        toTopicAddr: "storage-marketplace.addMarketplaceStorage",
+                        message: new Message<string, AddStorageMessage>
+                        {
+                            Key = Guid.NewGuid().ToString(),
+                            Value = new AddStorageMessage
+                            {
+                                ExternalStorageId = storeResult.Value.Id,
+                                BuildingNumberAddr = addrBuilding,
+                                CityAddr = addrCity,
+                                StreetAddr = addrStreet
+                            }
+                        },
+                        handler: (report) =>
+                        {
+                            _logger.LogInformation($"msg[storage-marketplace.addMarketplaceStorage] report: {report.Error.Reason} {report.Status.ToString()}");
+                        });
+                }
+                else _logger.LogCritical("[StoragesController] not found producer (AddStorageMessage)");
             }
 
             return Ok(storeResult);
@@ -174,7 +202,7 @@ namespace Storage.Api.Controllers
             var dtos = _productsRepository.Find(new ProductsOnStorageSpec(
                 onStorageId: storage_id));
 
-            return Ok(dtos);
+            return Ok(_mapper.Map<IEnumerable<StorageProduct>, StorageProductRead[]>(dtos));
         }
 
         [HttpGet("/{storage_id:int}/cells")]
@@ -183,7 +211,7 @@ namespace Storage.Api.Controllers
             var dtos = _storageCellRepository.Find(new CellsOnStorageSpec(
                 storageId: storage_id));
 
-            return Ok(dtos);
+            return Ok(_mapper.Map<IEnumerable<StorageCell>, StorageCellRead[]>(dtos));
         }
     }
 }
