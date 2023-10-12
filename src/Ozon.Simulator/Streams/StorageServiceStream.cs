@@ -2,15 +2,16 @@
 using Common.DTOs.Storage;
 using Grpc.Net.Client;
 using Grpc.Protos.Storages;
+using Simulator;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Tests.Streams
+namespace Ozon.Simulator.Streams
 {
-    internal class StorageStream
+    internal class StorageServiceStream
     {
         private List<StorageRead> _storages;
 
@@ -20,7 +21,7 @@ namespace Tests.Streams
 
         private Utils _utils = new Utils();
 
-        public StorageStream()
+        public StorageServiceStream()
         {
             _toStorageChannel = GrpcChannel.ForAddress("http://localhost:5009");
 
@@ -42,10 +43,8 @@ namespace Tests.Streams
             {
                 await stream.RequestStream.WriteAsync(new AddProductToStorageRequest
                 {
-                    //StorageId = 6,
-                    MarketplaceProductId = "f8b7ed4c-dd81-4814-8b7d-3fa9f4fcb499",
-                    //MarketplaceProductId = _marketplaceProducts[_utils.Rand(0, _marketplaceProducts.Count)].MarketplaceProductId,
-                    StorageId = _utils.Rand(6, 8),
+                    MarketplaceProductId = _marketplaceProducts[_utils.Rand(0, _marketplaceProducts.Count)].MarketplaceProductId,
+                    StorageId = 1,
                 });
 
                 Console.WriteLine(iterations);
