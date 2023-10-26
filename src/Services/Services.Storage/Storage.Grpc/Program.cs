@@ -1,3 +1,4 @@
+
 using App.Metrics.AspNetCore;
 using App.Metrics.Formatters.Prometheus;
 using Common.Repositories;

@@ -25,12 +25,20 @@ namespace Storage.Api.Extensions
                 EnableBackgroundPoll = false
             });
 
+            #region Upd-1
+
             producerFactory.Register<string, AddStorageMessage>(new ProducerConfig()
             {
                 BootstrapServers = kafkaHost,
                 Acks = Acks.Leader,
                 EnableBackgroundPoll = false,
+                MessageSendMaxRetries = 3,
+                RetryBackoffMs = 2000,
+                RequestTimeoutMs = 4000,
+                ReconnectBackoffMaxMs = 4000
             });
+
+            #endregion
 
             services.AddSingleton<IProducerFactory>(producerFactory);
         }

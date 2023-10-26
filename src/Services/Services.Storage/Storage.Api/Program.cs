@@ -10,6 +10,7 @@ using Storage.Api.Kafka;
 using Storage.Data.Context;
 using Storage.Data.Entities.Products;
 using Storage.Infrastructure.Repositories;
+using Storage.Infrastructure.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -50,22 +51,28 @@ builder.Services.AddHangfireServer(options => {
     options.Queues = new[] { "consumers", "beta", "default" };
 });
 
-builder.Services.AddDbContext<ApplicationContext>(options =>
+builder.Services.AddDbContext<StorageDbContext>(options =>
 {
     options.UseSqlServer(connection);
 });
 
-builder.Services.AddScoped(typeof(IServiceRepository<>), typeof(ServiceRepository<>));
+builder.Services.AddScoped(typeof(IServiceRepository<>), typeof(StorageRepository<>));
+builder.Services.AddScoped(typeof(IServiceAsyncRepository<>), typeof(StorageRepository<>));
+
+
+builder.Services.AddScoped<IStorageService, StorageService>();
+
+
 
 builder.Services.AddSingleton(new KafkaOptions(
     host: "kafka-broker:9092"));
 
-builder.Services.AddClickHouseStorageClient(
-    ch_connectionString: builder.Configuration.GetConnectionString("ClickHouseStorageDb"),
-    chOptions: new ClickHouseStorageServiceOptions(
-        kafkaHost: builder.Configuration["ClickHouse_kafka:KafkaHost"],
-        kafkaPort: builder.Configuration["ClickHouse_kafka:KafkaPort"],
-        productMovementTopic: builder.Configuration["ClickHouse_kafka:ProductMovementTopic"]));
+//builder.Services.AddClickHouseStorageClient(
+//    ch_connectionString: builder.Configuration.GetConnectionString("ClickHouseStorageDb"),
+//    chOptions: new ClickHouseStorageServiceOptions(
+//        kafkaHost: builder.Configuration["ClickHouse_kafka:KafkaHost"],
+//        kafkaPort: builder.Configuration["ClickHouse_kafka:KafkaPort"],
+//        productMovementTopic: builder.Configuration["ClickHouse_kafka:ProductMovementTopic"]));
 
 builder.Services.AddControllers();
 
@@ -86,3 +93,5 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
+public partial class StorageApiProgramEntrypoint { }

@@ -7,11 +7,11 @@ using Storage.Data.Entities;
 
 namespace Storage.Infrastructure.Repositories
 {
-    public class ServiceRepository<T> : IServiceRepository<T> where T : TServiceEntity
+    public class StorageRepository<T> : IServiceRepository<T>, IServiceAsyncRepository<T> where T : TServiceEntity
     {
-        private readonly ApplicationContext _dbContext;
+        private readonly StorageDbContext _dbContext;
 
-        public ServiceRepository(ApplicationContext dbContext)
+        public StorageRepository(StorageDbContext dbContext)
         {
             _dbContext = dbContext;
         }
@@ -42,6 +42,14 @@ namespace Storage.Infrastructure.Repositories
             {
                 return QueryResult<T>.Failure(exp.Message);
             }
+        }
+
+        public async Task<QueryResult<T>> CreateAsync(T entity)
+        {
+            await _dbContext.AddAsync<T>(entity);
+            var r = await _dbContext.SaveChangesAsync();
+
+            return  r > 0 ? QueryResult<T>.Successed(entity) : QueryResult<T>.Failure("Something went wrong");
         }
 
         public IEnumerable<T> Find(ISpecification<T> specification)

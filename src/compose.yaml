@@ -1,77 +1,77 @@
 version: "3.8"
 services:
 
-#click-house
-  click-house:
-    container_name: click-house
-    image: yandex/clickhouse-server
-    ports:
-      - "2183:2183"
-      - "8123:8123"
-    networks:
-      - ozon-net
+# #click-house
+#   click-house:
+#     container_name: click-house
+#     image: yandex/clickhouse-server
+#     ports:
+#       - "2183:2183"
+#       - "8123:8123"
+#     networks:
+#       - ozon-net
 
 
-# #kafka
-  zookeeper:
-    image: confluentinc/cp-zookeeper:7.3.0
-    hostname: zookeeper
-    container_name: zookeeper
-    environment:
-      ZOOKEEPER_CLIENT_PORT: 2181
-      ZOOKEEPER_TICK_TIME: 2000
-    networks:
-      - ozon-net
-    ports:
-      - "2181:2181"
-      - "2888:2888"
+# # #kafka
+#   zookeeper:
+#     image: confluentinc/cp-zookeeper:7.3.0
+#     hostname: zookeeper
+#     container_name: zookeeper
+#     environment:
+#       ZOOKEEPER_CLIENT_PORT: 2181
+#       ZOOKEEPER_TICK_TIME: 2000
+#     networks:
+#       - ozon-net
+#     ports:
+#       - "2181:2181"
+#       - "2888:2888"
 
-  kafka-broker:
-    image: confluentinc/cp-kafka:7.3.0
-    container_name: kafka-broker
-    ports:
-      - "9092:9092"
-    depends_on:
-      - zookeeper
-    environment:
-      KAFKA_BROKER_ID: 1
-      KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_INTERNAL:PLAINTEXT
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka-broker:9092,PLAINTEXT_INTERNAL://broker:29092
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
-      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
-    networks:
-      - ozon-net
+#   kafka-broker:
+#     image: confluentinc/cp-kafka:7.3.0
+#     container_name: kafka-broker
+#     ports:
+#       - "9092:9092"
+#     depends_on:
+#       - zookeeper
+#     environment:
+#       KAFKA_BROKER_ID: 1
+#       KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
+#       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_INTERNAL:PLAINTEXT
+#       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka-broker:9092,PLAINTEXT_INTERNAL://broker:29092
+#       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+#       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+#       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+#     networks:
+#       - ozon-net
 
-#services.products
-  products-mssql:
-    container_name: products-mssql
-    image: mcr.microsoft.com/mssql/server
-    ports:
-      - "1433"
-    volumes:
-      - .volumes/services.products/data:/var/opt/mssql/data
-      - .volumes/services.products/logs:/var/opt/mssql/logs
-    environment:
-      - MSSQL_SA_PASSWORD=Sample123!
-      - ACCEPT_EULA=Y
-    networks:
-     - ozon-net
+# #services.products
+#   products-mssql:
+#     container_name: products-mssql
+#     image: mcr.microsoft.com/mssql/server
+#     ports:
+#       - "1433"
+#     volumes:
+#       - .volumes/services.products/data:/var/opt/mssql/data
+#       - .volumes/services.products/logs:/var/opt/mssql/logs
+#     environment:
+#       - MSSQL_SA_PASSWORD=Sample123!
+#       - ACCEPT_EULA=Y
+#     networks:
+#      - ozon-net
 
-  products-api:
-    container_name: products-api
-    build: 
-      context: .
-      dockerfile: ./Services/Services.Products/Products.Api/Dockerfile
-    ports:
-     - "5016:80"
-     - "5015:443"
-    networks:
-     - ozon-net
-    depends_on:
-      - products-mssql
-      - kafka-broker
+#   products-api:
+#     container_name: products-api
+#     build: 
+#       context: .
+#       dockerfile: ./Services/Services.Products/Products.Api/Dockerfile
+#     ports:
+#      - "5016:80"
+#      - "5015:443"
+#     networks:
+#      - ozon-net
+#     depends_on:
+#       - products-mssql
+#       - kafka-broker
 
 #services.storages
   storage-mssql:
@@ -101,24 +101,24 @@ services:
      - ozon-net
     depends_on:
       - storage-mssql
-      - kafka-broker
-      - click-house
+      # - kafka-broker
+      # - click-house
       #- ozon-simulator
 
-  storage-grpc:
-    container_name: storage-grpc
-    build: 
-      context: .
-      dockerfile: ./Services/Services.Storage/Storage.Grpc/Dockerfile
-    ports:
-      - "5009:80"
-      - "5010:443"
-    networks:
-     - ozon-net
-    depends_on:
-      - storage-mssql
-      - kafka-broker
-      # - click-house 
+  # storage-grpc:
+  #   container_name: storage-grpc
+  #   build: 
+  #     context: .
+  #     dockerfile: ./Services/Services.Storage/Storage.Grpc/Dockerfile
+  #   ports:
+  #     - "5009:80"
+  #     - "5010:443"
+  #   networks:
+  #    - ozon-net
+  #   depends_on:
+  #     - storage-mssql
+  #     - kafka-broker
+  #     # - click-house 
 
 #services.accounts
   # accounts-mssql:
@@ -147,33 +147,33 @@ services:
   #  depends_on:
   #    - accounts-mssql
 
-  #services.accounts
-  marketplace-mssql:
-   container_name: marketplace-mssql
-   image: mcr.microsoft.com/mssql/server
-   volumes:
-      - .volumes/services.marketplace/data:/var/opt/mssql/data
-      - .volumes/services.marketplace/logs:/var/opt/mssql/logs
-   ports:
-     - "7073:1433"
-   environment:
-     - MSSQL_SA_PASSWORD=Sample123!
-     - ACCEPT_EULA=Y
-   networks:
-     - ozon-net
+  # #services.accounts
+  # marketplace-mssql:
+  #  container_name: marketplace-mssql
+  #  image: mcr.microsoft.com/mssql/server
+  #  volumes:
+  #     - .volumes/services.marketplace/data:/var/opt/mssql/data
+  #     - .volumes/services.marketplace/logs:/var/opt/mssql/logs
+  #  ports:
+  #    - "7073:1433"
+  #  environment:
+  #    - MSSQL_SA_PASSWORD=Sample123!
+  #    - ACCEPT_EULA=Y
+  #  networks:
+  #    - ozon-net
 
-  marketplace-api:
-   container_name: marketplace-api
-   build: 
-     context: .
-     dockerfile: ./Services/Services.Marketplace/Marketplace.Api/Dockerfile
-   ports:
-     - "5021:80"
-     - "5020:443"
-   networks:
-     - ozon-net
-   depends_on:
-     - marketplace-mssql
+  # marketplace-api:
+  #  container_name: marketplace-api
+  #  build: 
+  #    context: .
+  #    dockerfile: ./Services/Services.Marketplace/Marketplace.Api/Dockerfile
+  #  ports:
+  #    - "5021:80"
+  #    - "5020:443"
+  #  networks:
+  #    - ozon-net
+  #  depends_on:
+  #    - marketplace-mssql
 
 #services.authorize
   # authorize-redis:
@@ -209,27 +209,27 @@ services:
   #     - ozon-net
 
 
-#monitoring
-  prometheus:
-    container_name: metrics-prometheus
-    image: prom/prometheus
-    networks:
-      - ozon-net
-    ports:
-      - "9090:9090"
-    volumes:
-      - .volumes/metrics/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
-      - .volumes/metrics/prometheus/data:/prometheus 
+# #monitoring
+#   prometheus:
+#     container_name: metrics-prometheus
+#     image: prom/prometheus
+#     networks:
+#       - ozon-net
+#     ports:
+#       - "9090:9090"
+#     volumes:
+#       - .volumes/metrics/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+#       - .volumes/metrics/prometheus/data:/prometheus 
 
-  grafana:
-    image: grafana/grafana
-    container_name: metrics-grafana
-    ports:
-      - "3000:3000"
-    volumes:
-      - ".volumes/metrics/grafana:/var/lib/grafana"
-    networks:
-      - ozon-net
+#   grafana:
+#     image: grafana/grafana
+#     container_name: metrics-grafana
+#     ports:
+#       - "3000:3000"
+#     volumes:
+#       - ".volumes/metrics/grafana:/var/lib/grafana"
+#     networks:
+#       - ozon-net
 
 #api
   ozon-api:

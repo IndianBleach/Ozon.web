@@ -49,7 +49,7 @@ namespace Ozon.Bus
                     message: message,
                     deliveryHandler: handler);
 
-                _producer.Flush();
+                //_producer.Flush(TimeSpan.FromSeconds(2));
             }
             catch (Exception exp)
             {

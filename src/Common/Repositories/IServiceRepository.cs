@@ -25,4 +25,9 @@ namespace Common.Repositories
 
         IDbContextTransaction NewTransaction();
     }
+
+    public interface IServiceAsyncRepository<T> where T : class
+    {
+        Task<QueryResult<T>> CreateAsync(T entity);
+    }
 }

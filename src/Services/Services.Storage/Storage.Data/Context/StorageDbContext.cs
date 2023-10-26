@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace Storage.Data.Context
 {
-    public class ApplicationContext : DbContext
+    public class StorageDbContext : DbContext
     {
         public DbSet<StorageProduct> StorageProducts { get; set; }
 
@@ -27,10 +27,10 @@ namespace Storage.Data.Context
 
         public DbSet<StorageActionType> StorageActionTypes { get; set; }
 
-        public ApplicationContext(DbContextOptions<ApplicationContext> opt)
+        public StorageDbContext(DbContextOptions<StorageDbContext> opt)
             : base(opt)
         {
-            //Database.EnsureCreated();
+            Database.EnsureCreated();
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

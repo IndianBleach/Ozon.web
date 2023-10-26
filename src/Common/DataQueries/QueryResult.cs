@@ -48,6 +48,14 @@ namespace Common.DataQueries
                 SuccessValueId = queryValueIntId.Value
             };
         }
+
+        public static ApiResponseRead<T> ToApiResponse<T>(this QueryResult<T> query)
+        {
+            if (!query.IsSuccessed || query.Value == null)
+                return ApiResponseRead<T>.Failure(new string[] { query.StatusMessage ??  "Something went wrong"});
+
+            return ApiResponseRead<T>.Successed(query.Value);
+        }
     }
 
     public class QueryResultResponseRead<T>
@@ -59,9 +67,33 @@ namespace Common.DataQueries
         public bool IsSuccessed { get;  set; }
     }
 
+    public class ApiResponseRead<T>
+    {
+        public T? Value { get; set; }
+
+        public IEnumerable<string> Errors { get;  set; } = new List<string>();
+
+        public bool IsSuccessed { get; set; }
+
+        public static ApiResponseRead<T> Successed(T value)
+            => new ApiResponseRead<T>
+            {
+                IsSuccessed = true,
+                Value = value
+            };
+
+        public static ApiResponseRead<T> Failure(IEnumerable<string> errors)
+            => new ApiResponseRead<T>
+            {
+                Errors = errors,
+                IsSuccessed = false,
+                Value = default(T)
+            };
+    }
+
     public class QueryResult<T>
     {
-        public T Value { get; private set; }
+        public T? Value { get; private set; }
 
         public string? StatusMessage { get; private set; }
 

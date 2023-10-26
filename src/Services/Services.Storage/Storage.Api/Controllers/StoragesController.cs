@@ -6,17 +6,22 @@ using Common.DTOs.Storage;
 using Common.Grpc.Extensions;
 using Common.Repositories;
 using Confluent.Kafka;
+using FluentValidation;
+using FluentValidation.Results;
 using Hangfire;
 using Microsoft.AspNetCore.Mvc;
 using Ozon.Bus;
 using Ozon.Bus.DTOs.StorageService;
 using Storage.Api.Kafka.Services;
+using Storage.Api.Validations;
 using Storage.Data.Entities.Actions;
 using Storage.Data.Entities.Address;
 using Storage.Data.Entities.Employees;
 using Storage.Data.Entities.Products;
 using Storage.Data.Entities.Storage;
+using Storage.Infrastructure.DTOs;
 using Storage.Infrastructure.Mappers;
+using Storage.Infrastructure.Services;
 using Storage.Infrastructure.Specifications;
 using System.Threading;
 
@@ -29,65 +34,119 @@ namespace Storage.Api.Controllers
     {
         private IProducerFactory _producerFactory;
 
-        private IMapper _mapper;
-
         private IMetrics _metrics;
 
         private readonly ILogger<StoragesController> _logger;
-
-        private readonly IServiceRepository<MarketStorage> _storageRepository;
-
-        private readonly IServiceRepository<StorageCell> _storageCellRepository;
-
-        private readonly IServiceRepository<AddressPoint> _addressRepository;
 
         private readonly IServiceRepository<StorageEmployee> _employeeRepository;
 
         private readonly IServiceRepository<StorageActionType> _actionTypesRepository;
 
-        private IServiceRepository<StorageProduct> _productsRepository;
-
+        private readonly IStorageService _storageService;
         public StoragesController(
             IMetrics metrics,
+            IStorageService storageService,
             IProducerFactory producerFactory,
             ILogger<StoragesController> logger,
-            IServiceRepository<MarketStorage> storageRepository,
-            IServiceRepository<StorageCell> cellRepository,
-            IServiceRepository<AddressPoint> addrRepository,
             IServiceRepository<StorageEmployee> employeeRepository,
-            IServiceRepository<StorageActionType> actionTypesRepository,
-            IServiceRepository<StorageProduct> productsRepository)
+            IServiceRepository<StorageActionType> actionTypesRepository)
         {
+            _storageService = storageService;
+
             _metrics = metrics;
 
             _producerFactory = producerFactory;
 
-            _productsRepository = productsRepository;
-            _storageCellRepository = cellRepository;
-            _addressRepository = addrRepository;
             _employeeRepository = employeeRepository;
             _actionTypesRepository = actionTypesRepository;
-            _storageRepository = storageRepository;
 
             _logger = logger;
+        }
 
-            var config = new MapperConfiguration(cfg => cfg.AddProfiles(new List<Profile> {
-                new StorageMapperProfile()
-            }));
+        #region Upd-1
 
-            _mapper = new Mapper(config);
+        [HttpPost("/")]
+        public async Task<IActionResult> CreateStorage([FromBody]StorageApiCreate model)
+        {
+            ValidationResult validationResult = await ValidationRegistry.CreateStorageValidator
+                .ValidateAsync(model);
+
+            if (!validationResult.IsValid)
+                return BadRequest(ApiResponseRead<MarketStorage>.Failure(validationResult.Errors
+                    .Select(er => er.ErrorMessage)));
+
+            QueryResult<MarketStorage> createStorageQuery = await _storageService.CreateStorageAsync(model);
+
+            if (createStorageQuery.Value == null || !createStorageQuery.IsSuccessed)
+                return Ok(createStorageQuery.ToApiResponse());
+
+            var producer = _producerFactory.Get<string, AddStorageMessage>();
+
+            if (producer != null)
+            {
+                _logger.LogInformation("+msg to [storage-marketplace.addMarketplaceStorage] storageId: " + createStorageQuery.Value.Id);
+
+                producer.PublishMessage(
+                    toTopicAddr: "storage-marketplace.addMarketplaceStorage",
+                    message: new Message<string, AddStorageMessage>
+                    {
+                        Key = Guid.NewGuid().ToString(),
+                        Value = new AddStorageMessage
+                        {
+                            ExternalStorageId = createStorageQuery.Value.Id,
+                            BuildingNumberAddr = model.AddrBuilding,
+                            CityAddr = model.AddrCity,
+                            StreetAddr = model.AddrStreet
+                        }
+                    },
+                    handler: (report) =>
+                    {
+                        _logger.LogInformation($"msg[storage-marketplace.addMarketplaceStorage] report: {report.Error.Reason} {report.Status.ToString()}");
+                    });
+            }
+            else _logger.LogCritical("[StoragesController] not found producer (AddStorageMessage)");
+
+            return Ok(createStorageQuery.ToApiResponse());
+        }
+
+        [HttpPost("/{storage_id:int}/cells")]
+        public async Task<IActionResult> CreateStorageCell(
+           [FromRoute]int storage_id,
+           [FromBody] StorageCellApiCreate model)
+        {
+            ValidationResult validationResult = await ValidationRegistry.CreateStorageCellValidator
+                .ValidateAsync(model);
+
+            if (!validationResult.IsValid)
+                return BadRequest(ApiResponseRead<StorageCell>.Failure(validationResult.Errors
+                    .Select(er => er.ErrorMessage)));
+
+            return Ok(_storageService.CreateStorageCellAsync(storage_id, model)
+                .Result
+                .ToApiResponse());
         }
 
         [HttpPost("/actions")]
         public async Task<IActionResult> CreateActionType(
-           string actionName)
+           [FromBody]StorageActionTypeApiCreate model)
         {
-            StorageActionType action = new StorageActionType(
-                name: actionName,
-                dateCreated: DateTime.Now);
+            ValidationResult validationResult = await ValidationRegistry.CreateActionTypeValidator
+                .ValidateAsync(model);
 
-            return Ok(_actionTypesRepository.Create(action));
+            if (!validationResult.IsValid)
+                return BadRequest(ApiResponseRead<StorageActionType>.Failure(validationResult.Errors
+                    .Select(er => er.ErrorMessage)));
+
+            return Ok(_storageService.CreateStorageActionTypeAsync(model)
+                .Result
+                .ToApiResponse());
         }
+
+
+
+        #endregion
+
+
 
 
         [HttpPost("/{storage_id:int}/employees")]
@@ -103,73 +162,14 @@ namespace Storage.Api.Controllers
             return Ok(_employeeRepository.Create(emp));
         }
 
-        [HttpPost("/{storage_id:int}/cells")]
-        public async Task<IActionResult> CreateStorageCell(
-           int storage_id,
-           string title,
-           string comment)
-        {
-            StorageCell cell = new StorageCell(
-                 cellNumber: title,
-                 commentary: comment,
-                 storageId: storage_id);
+        
 
-            var result = _storageCellRepository.Create(cell);
 
-            return Ok(result);
-        }
 
-        [HttpPost("/")]
-        public async Task<IActionResult> CreateStorage(
-            string addrCity,
-            string addrStreet,
-            string addrBuilding)
-        {
-            QueryResult<AddressPoint> addrResult = _addressRepository.Create(new AddressPoint(
-                cityAddr: addrCity,
-                streetAddr: addrStreet,
-                buildingNumberAddr: addrBuilding));
+        
 
-            if (!addrResult.IsSuccessed)
-                return Ok(addrResult);
 
-            MarketStorage store = new MarketStorage(
-                addressId: addrResult.Value.Id);
-
-            QueryResult<MarketStorage> storeResult = _storageRepository.Create(store);
-
-            if (storeResult.IsSuccessed)
-            {
-                var producer = _producerFactory.Get<string, AddStorageMessage>();
-
-                if (producer != null)
-                {
-                    _logger.LogInformation("+msg to [storage-marketplace.addMarketplaceStorage] storageId: " + storeResult.Value.Id);
-
-                    producer.PublishMessage(
-                        toTopicAddr: "storage-marketplace.addMarketplaceStorage",
-                        message: new Message<string, AddStorageMessage>
-                        {
-                            Key = Guid.NewGuid().ToString(),
-                            Value = new AddStorageMessage
-                            {
-                                ExternalStorageId = storeResult.Value.Id,
-                                BuildingNumberAddr = addrBuilding,
-                                CityAddr = addrCity,
-                                StreetAddr = addrStreet
-                            }
-                        },
-                        handler: (report) =>
-                        {
-                            _logger.LogInformation($"msg[storage-marketplace.addMarketplaceStorage] report: {report.Error.Reason} {report.Status.ToString()}");
-                        });
-                }
-                else _logger.LogCritical("[StoragesController] not found producer (AddStorageMessage)");
-            }
-
-            return Ok(storeResult);
-        }
-
+        #region Old update
 
         [HttpGet("/actions")]
         public async Task<IActionResult> GetAllStorageActions()
@@ -190,28 +190,26 @@ namespace Storage.Api.Controllers
         [HttpGet("/")]
         public async Task<IActionResult> GetAllStorages()
         {
-            var dtos = _storageRepository.GetAll();
-
-            return Ok(_mapper.Map<IEnumerable<MarketStorage>, IEnumerable<StorageRead>>(dtos));
+            return Ok(_storageService.GetAllStorages());
         }
+
+        #endregion
 
 
         [HttpGet("/{storage_id:int}/products")]
         public async Task<IActionResult> GetStorageProducts(int storage_id)
         {
-            var dtos = _productsRepository.Find(new ProductsOnStorageSpec(
-                onStorageId: storage_id));
+            var dtos = _storageService.GetStorageProducts(storage_id);
 
-            return Ok(_mapper.Map<IEnumerable<StorageProduct>, StorageProductRead[]>(dtos));
+            return Ok(dtos);
         }
 
         [HttpGet("/{storage_id:int}/cells")]
         public async Task<IActionResult> GetAllStorageCells(int storage_id)
         {
-            var dtos = _storageCellRepository.Find(new CellsOnStorageSpec(
-                storageId: storage_id));
+            var dtos = _storageService.GetStorageCells(storage_id);
 
-            return Ok(_mapper.Map<IEnumerable<StorageCell>, StorageCellRead[]>(dtos));
+            return Ok(dtos);
         }
     }
 }
